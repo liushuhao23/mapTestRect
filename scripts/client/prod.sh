@@ -1,0 +1,1 @@
+cross-env NODE_ENV=production; cross-env mode=prod webpack --config ./config/webpack.prod.config.js

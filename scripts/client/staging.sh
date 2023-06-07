@@ -1,0 +1,1 @@
+cross-env NODE_ENV=production; cross-env mode=staging webpack --config ./config/webpack.staging.config.js
