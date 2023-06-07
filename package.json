@@ -2,10 +2,9 @@
   "name": "mapReact",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "dev": "client:dev",
-    "staging": "vue-cli-service build --mode staging",
+    "staging": "client:staging",
     "prod": "client:prod",
     "test": "client:test",
     "client:dev": "scripty",

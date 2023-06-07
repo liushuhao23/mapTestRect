@@ -8,7 +8,7 @@ const _modeflag = _mode === 'production' ? true : false;
 const WebpackBar = require('webpackbar');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-console.log(APP_PUBLIC_PATH, 'APP_PUBLIC_PATH')
+console.log(process.env.APP_PUBLIC_PATH, 'APP_PUBLIC_PATH')
 console.log(mode, 'mode')
 console.log(_mode, '_mode')
 
@@ -17,8 +17,8 @@ const webpackBaseConfig = {
     main: resolve('src/web/index.tsx'),
   },
   output: {
-    path: path.resolve(__dirname, '../dist'),
-    publicPath: APP_PUBLIC_PATH,
+    path: resolve(__dirname, '../dist'),
+    publicPath: process.env.APP_PUBLIC_PATH,
     filename: 'scripts/[name].[contenthash:5].bundule.js'
   },
   cache: {
@@ -33,7 +33,7 @@ const webpackBaseConfig = {
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/,
+        test: /\.(js|ts|tsx)$/,
         // include: '/node_modules/',
         use: {
           loader: 'swc-loader',
@@ -42,7 +42,6 @@ const webpackBaseConfig = {
       {
         test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/i,
         type: 'asset/resource',
-        assetModuleFilname: "asset/[name].[hash:6].[ext]"
       },
       {
         test: /\.css$/i,
@@ -73,7 +72,6 @@ const webpackBaseConfig = {
       {
         test: /\.(png|jpg|svg)$/,
         type: 'asset',
-        assetModuleFilname: "asset/[name].[hash:6].[ext]"
       },
       // {
       //   resourceQuery: /raw-lingui/,
@@ -109,7 +107,7 @@ const webpackBaseConfig = {
       '@type': resolve('src/web/type'),
 
     },
-    extensions: ['.js', '.ts', '.tsx', 'jsx', '.css'],
+    extensions: ['.js', '.ts', '.tsx', '.jsx', '.css'],
   },
   plugins: [
     // new NodePolyfillPlugin(),

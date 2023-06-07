@@ -4,16 +4,18 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-07 13:48:23
+ * @LastEditTime: 2023-06-07 18:06:38
  */
 import './public-path'
 import App from '@pages/App';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, HashRouter  } from 'react-router-dom';
 import './style.css';
-// import 'antd/dist/antd.css';
+import 'antd/dist/antd.css';
 // import 'antd/dist/antd.less';
 // antd/dist/antd.less
+import './asstes/theme/index.less'
+
 
 // import 'codemirror/lib/codemirror.css';
 // import 'codemirror/lib/codemirror.js';

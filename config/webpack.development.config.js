@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:08
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-07 15:07:56
+ * @LastEditTime: 2023-06-07 17:32:33
  */
 const { join, resolve } = require('path');
 const FriendlyErrorsWebpackPlugin = require('@soda/friendly-errors-webpack-plugin');
@@ -55,13 +55,6 @@ module.exports = {
   },
   devtool: false,
   plugins: [
-    // new Conversion({
-    //   url: 'src/web/menu/index.ts',
-    //   targetUrl: 'src/web/components/article',
-    //   routerUrl: 'src/web/routers/children',
-    //   isFileList: true,
-    // }),
-
     new Dotenv({
       path: './.env.development',
     }),

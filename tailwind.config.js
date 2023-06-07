@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-05-28 20:59:44
  * @LastEditors: liushuhao
- * @LastEditTime: 2022-09-28 23:26:26
+ * @LastEditTime: 2023-06-07 18:04:41
  */
 const typography = require('@tailwindcss/typography');
 module.exports = {
