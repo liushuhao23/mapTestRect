@@ -8,7 +8,8 @@ const _modeflag = _mode === 'production' ? true : false;
 const WebpackBar = require('webpackbar');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-console.log(process.env.APP_PUBLIC_PATH, 'APP_PUBLIC_PATH')
+const packageName = require('./package.json').name;
+
 console.log(mode, 'mode')
 console.log(_mode, '_mode')
 
@@ -17,8 +18,11 @@ const webpackBaseConfig = {
     main: resolve('src/web/index.tsx'),
   },
   output: {
+    library: `${packageName}-[name]`,
+    libraryTarget: 'umd',
+    globalObject: 'window',
     path: resolve(__dirname, '../dist'),
-    publicPath: process.env.APP_PUBLIC_PATH,
+    // publicPath: process.env.APP_PUBLIC_PATH,
     filename: 'scripts/[name].[contenthash:5].bundule.js'
   },
   cache: {

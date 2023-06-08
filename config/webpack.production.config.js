@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:16
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-07 14:18:55
+ * @LastEditTime: 2023-06-08 15:43:24
  */
 const TerserPlugin = require('terser-webpack-plugin');
 const os = require('os');
@@ -13,6 +13,9 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 module.exports = {
+  output: {
+    publicPath: process.env.APP_PUBLIC_PATH,
+  },
   optimization: {
     minimize: true,
     minimizer: [

@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2022-12-04 22:49:02
+ * @LastEditTime: 2023-06-08 16:46:52
  */
 
 import Loading from '@components/Loading';
@@ -34,6 +34,8 @@ const HooksTest = lazy(() => import('@pages/hooksTest/getStateTest'))
 
 const AsyncComponents = lazy(() => import('@pages/asyncComponents/index'))
 
+const MapCom = lazy(() => import('@pages/mapCom/index'))
+
 
 
 
@@ -60,6 +62,7 @@ const mainRoutes: any = {
     { path: 'blogItem', element: lazyLayout(<LobgItem></LobgItem>)},
     { path: 'hooksTest', element: lazyLayout(<HooksTest></HooksTest>)},
     { path: 'asyncComponents', element: lazyLayout(<AsyncComponents></AsyncComponents>)},
+    { path: 'mapCom', element: <MapCom></MapCom>},
   ],
 };
 

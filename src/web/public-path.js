@@ -4,9 +4,8 @@
  * @Autor: liushuhao
  * @Date: 2022-11-19 17:45:28
  * @LastEditors: liushuhao
- * @LastEditTime: 2022-11-19 17:45:32
+ * @LastEditTime: 2023-06-08 14:29:20
  */
-if (window.__MICRO_APP_ENVIRONMENT__) {
-    // eslint-disable-next-line
-    __webpack_public_path__ = window.__MICRO_APP_PUBLIC_PATH__
-  }
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
