@@ -4,74 +4,87 @@
  * @Autor: liushuhao
  * @Date: 2022-11-04 09:08:43
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-01-30 09:35:44
+ * @LastEditTime: 2023-06-11 22:43:35
  */
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import { UtilsTools }  from '../utils/utilsTools'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { message } from 'antd';
-const isDev = process.env.NODE_ENV === 'development'
-import { WorkSpaceData } from './setHeader'
+// import { WorkSpaceData } from './setHeader'
 import { settingHttpHeaders } from './useHttp';
+// import { logoutFun } from '../utils/login';
+import whiteList from './whiteList';
+
+const isDev = process.env.NODE_ENV === 'development';
+
+const ContentTypeMenu = {
+  json: 'application/json',
+  formData: 'application/x-www-form-urlencoded'
+};
+
+const reLogin = () => {
+  message.error('登录状态已过期，请重新登录！');
+  setTimeout(() => {
+    // logoutFun();
+  }, 1000);
+};
 
 const Http = axios.create({
-    baseURL:  'http://localhost:8888', // api请求的baseURL
-    timeout: 600000,
-    withCredentials: true, // 允许跨域 cookie
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization':  `Bearer ${WorkSpaceData.jwt}`
-    },
-    maxContentLength: 2000
-})
+  baseURL: isDev?  'http://localhost:3004/tianshan' : '/tianshan', // api请求的baseURL
+  timeout: 600000,
+  headers: {
+    'Content-Type': ContentTypeMenu.json
+    // 'Authorization':  `Bearer ${WorkSpaceData.jwt}`
+  },
+  maxContentLength: 2000
+});
+
+const formDataHttp = axios.create({
+  baseURL: '/', // api请求的baseURL
+  timeout: 600000,
+  withCredentials: true, // 允许跨域 cookie
+  headers: {
+    'Content-Type': ContentTypeMenu.json
+    // 'Authorization':  `Bearer ${WorkSpaceData.jwt}`
+  },
+  maxContentLength: 2000
+});
+
 // 请求拦截器
 Http.interceptors.request.use(
-    (config: any) => {
-        return settingHttpHeaders(config)
-    },
-    (err: AxiosRequestConfig) => Promise.reject(err)
-)
+  (config: any) => settingHttpHeaders(config),
+  (err: AxiosRequestConfig) => Promise.reject(err)
+);
 Http.interceptors.response.use(
-    (response: AxiosResponse) => {
-        if (response.status === 200 || response.status === 201) {
-            if (response.config.responseType === 'blob' || response.config.responseType === 'arraybuffer') {
-                return new Promise(resolve => {
-                    const result = UtilsTools.dealBlob(response)
-                    result.then((data: any) => {
-                        if (!data.success) {
-                            message.error(data.errMessage || '');
-                        } else {
-                            resolve(data)
-                        }
-                    })
-                })
-            }
-            if (response.data.code === '802' || response.data.code === 802) {
-                window.location.href = `${response.data.errMessage}`
-                return
-            }
-            if (!response.data.success) {
-                message.error(response.data.errMessage || '');
-            }
-            return response.data
+  // eslint-disable-next-line consistent-return
+  (response: AxiosResponse) => {
+    if (response.status === 200) {
+      // 放行 白名单 域名
+      if (response?.request?.responseURL) {
+        const url = new URL(response?.request?.responseURL as string);
+        if (whiteList.includes(url.origin)) {
+          return response.data;
         }
-        if (response.status === 400) {
-            message.error(response.data.errMessage || '');
-            return
-        }
-        if (response.status === 401) {
-        }
-    },
-    (err: {
-        response: AxiosResponse
-    } ) => {
-        if (err.response.status === 401) {
-            window.microApp.dispatch({ signout: true })
-            // window.eventCenterForAppalgorithm.dispatch(params)
-        } else {
-            message.error('服务器错误，错误代码500！')
-        }
-        Promise.reject(err)
-        return { success: false }
+      }
+      if (response.data.code !== 200 && response.data.code !== '200') {
+        message.error(response.data.message);
+      }
+      if (response.data.code === 401) {
+        reLogin();
+      }
+      if (response.data.code === 200 || response.data.code === '200') {
+        return response.data;
+      }
     }
-)
-export { Http }
+  },
+  (err: { response: AxiosResponse }) => {
+    // message.error(err.response.)
+    console.log(err, 'err');
+    // if (err.response.status === 401) {
+    //     // window.eventCenterForAppalgorithm.dispatch(params)
+    // } else {
+    //     message.error('服务器错误，错误代码500！')
+    // }
+    return err;
+  }
+);
+
+export { Http, formDataHttp };

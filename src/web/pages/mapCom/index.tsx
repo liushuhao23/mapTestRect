@@ -4,12 +4,15 @@
  * @Autor: liushuhao
  * @Date: 2023-06-08 13:50:56
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-08 13:51:03
+ * @LastEditTime: 2023-06-11 20:59:47
  */
 import React, { useState, FC } from 'react'
-const Index: FC = () => {
+import TiandituMap from './tianditu'
+const MapCom: FC = () => {
     return (
-      <span>map 模板</span>
+      <div className='h-full w-full'>
+        <TiandituMap></TiandituMap>
+      </div>
     )
 }
-export default Index
+export default MapCom

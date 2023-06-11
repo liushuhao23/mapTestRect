@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:08
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-08 22:53:14
+ * @LastEditTime: 2023-06-11 22:43:29
  */
 const { join, resolve } = require('path');
 const FriendlyErrorsWebpackPlugin = require('@soda/friendly-errors-webpack-plugin');
@@ -15,7 +15,6 @@ const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
 
 const prot = 3004;
-console.log(process.env.APP_PUBLIC_PATH, 'process.env.APP_PUBLIC_PATH  cross-env APP_PUBLIC_PATH=map')
 module.exports = {
   output: {
     publicPath: `/${process.env.APP_PUBLIC_PATH}/`,
