@@ -10,12 +10,12 @@
 import { AxiosRequestConfig } from 'axios';
 let workspaceData: any
 export const getWorkspaceData = (val: any) => {
-  console.log(val, 'val8888888888888')
   workspaceData = val
 } 
 
 export const settingHttpHeaders = (requestConfig: any,): AxiosRequestConfig => {
-  console.log(workspaceData,'xjjxjxjxjxjjxjxjxjjxj')
-  requestConfig.headers['Uc-Authorization'] = workspaceData.token;
+  if( workspaceData?.token) {
+    requestConfig.headers['Uc-Authorization'] = workspaceData.token;
+  }
   return requestConfig;
 }

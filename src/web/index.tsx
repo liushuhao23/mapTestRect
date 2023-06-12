@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 00:01:10
+ * @LastEditTime: 2023-06-13 00:11:57
  */
 import './public-path'
 import App from '@pages/App';
@@ -39,7 +39,6 @@ export async function bootstrap() {
 }
 
 export async function mount(props: any) {
-  console.log(props, 'props')
   render(props);
   new CommunicationProtocol(props)
   console.log('[map] props from main framework', props);

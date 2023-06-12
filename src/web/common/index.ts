@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-02-13 15:10:28
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 00:03:46
+ * @LastEditTime: 2023-06-13 00:11:41
  */
 
 import { emitter } from "@web/mitt";
@@ -32,7 +32,6 @@ class CommunicationProtocol {
 
     Init() {
       const { globalStore } = this.options;
-      console.log(globalStore, 'globalStore')
       if (globalStore) {
         this.globalStore = globalStore;
         // 监听全局数据存储对象更新
