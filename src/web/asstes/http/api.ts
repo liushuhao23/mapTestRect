@@ -32,7 +32,6 @@ class Api {
   protected post(url: string, data?: any, config?: AxiosRequestConfig, type = 'default') {
     return new Promise<AjaxReturnType>((resolve, reject) => {
       return Http.post(url, data, config).then((rs: any) => {
-        console.log(rs, 'jjjjj')
         if ((rs as any as AjaxReturnType).code === 200) {
           resolve(rs as any as AjaxReturnType)
           return

@@ -1,0 +1,15 @@
+{
+    "name":"北京市",
+    "level":1,
+    "geojson":"",
+    "geom":null,
+    "population":null,
+    "area":null,
+    "isLeaf":0,
+    "isLeafBoolean":false,
+    "code":"110000000000",
+    "children":null,
+    "xcoordinate":116.41228398796885,
+    "ycoordinate":40.185568281808926,
+    "pcode":null
+}

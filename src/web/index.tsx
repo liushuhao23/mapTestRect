@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-12 17:13:15
+ * @LastEditTime: 2023-06-13 00:01:10
  */
 import './public-path'
 import App from '@pages/App';
@@ -13,10 +13,15 @@ import { BrowserRouter, HashRouter  } from 'react-router-dom';
 import './style.css';
 import 'antd/dist/antd.css';
 import './asstes/theme/index.less'
+import { emitter } from './mitt';
+import { CommunicationProtocol } from './common';
+import { getWorkspaceData } from './asstes/http/useHttp';
+
 
 let root: any;
 function render(props: any) {
   const { container } = props;
+  emitter.on('getWorkspaceData', getWorkspaceData)
   root = createRoot(container? container.querySelector('#app')! : document.querySelector('#app'));
   root.render(
     <BrowserRouter basename={window.__POWERED_BY_QIANKUN__ ? '/maApp' : '/'} >
@@ -34,8 +39,10 @@ export async function bootstrap() {
 }
 
 export async function mount(props: any) {
-  console.log('[react18] props from main framework', props);
+  console.log(props, 'props')
   render(props);
+  new CommunicationProtocol(props)
+  console.log('[map] props from main framework', props);
 }
 
 export async function unmount(props: any) {

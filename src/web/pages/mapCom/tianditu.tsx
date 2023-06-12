@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-11 22:47:51
+ * @LastEditTime: 2023-06-12 23:47:16
  */
 import React, { useState, FC, useEffect, useRef } from 'react'
 import 'ol/ol.css';
@@ -13,11 +13,16 @@ import { Map, View } from 'ol';
 import XYZ from 'ol/source/XYZ'
 import TileLayer from 'ol/layer/Tile.js';
 import { fromLonLat } from "ol/proj";
+import { DivisionApi } from '@web/api/map';
 
 const TiandituMap: FC = () => {
     let centerPos = fromLonLat([116.40769, 39.89945]);
     const mapCurrent = useRef(null)
     let map = null;
+    const getInfo = async () => {
+        const data =  await DivisionApi.getOneLevel()
+        console.log('getInfogetInfogetInfogetInfogetInfogetInfo', data,  )
+    }
     useEffect(() => {
         map = new Map({
             view: new View({
@@ -46,6 +51,7 @@ const TiandituMap: FC = () => {
         map.addLayer(tileLayer)
         map.addLayer(tileLayerMark)
         console.log('输出',  'xxhh')
+        getInfo()
     }, [])
     return (
         <div id="map" className='mapMontainer'  ref={mapCurrent}></div>

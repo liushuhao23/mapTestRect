@@ -39,7 +39,7 @@
       "@constants/*": ["web/constants/*"],
       "@web/*": ["web/*"],
       "@resource/*": ["web/resource/*"],
-      "@type/*": ["web/type/*"]
+      "@type/*": ["web/type/*"],
     }
   },
   "include": ["src", "tests"],
