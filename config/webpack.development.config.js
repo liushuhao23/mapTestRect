@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:08
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-11 22:43:29
+ * @LastEditTime: 2023-06-12 09:27:58
  */
 const { join, resolve } = require('path');
 const FriendlyErrorsWebpackPlugin = require('@soda/friendly-errors-webpack-plugin');
@@ -57,6 +57,7 @@ module.exports = {
     },
     hot: true,
     port: prot,
+    open: true
   },
   devtool: false,
   plugins: [

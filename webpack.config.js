@@ -10,9 +10,6 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const packageName = require('./package.json').name;
 
-console.log(mode, 'mode')
-console.log(_mode, '_mode')
-
 const webpackBaseConfig = {
   entry: {
     main: resolve('src/web/index.tsx'),
