@@ -4,14 +4,14 @@
  * @Autor: liushuhao
  * @Date: 2023-04-23 11:16:10
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-12 23:45:39
+ * @LastEditTime: 2023-06-13 14:23:41
  */
 
 import ApiBase from '../../asstes/http/api';
 import { CityItem, TypeItem, ProjectItem, EntItem } from '@type/map';
 import { ReverseReferenceCity } from '@type/map/common';
 
-const mockUrl = 'http://127.0.0.1:4523/m1/2230446-0-default';
+const mockUrl = '/gisconfig';
 
 const divisionPath = {
   cityList: '/division/api/v1/city/cityList',
@@ -36,7 +36,7 @@ class Division extends ApiBase {
     return this.get(`${divisionPath.getTianDiTuPosition}?postStr={"keyWord":${JSON.stringify(params.keyWord)},"level":12,"mapBound":"116.02524,39.83833,116.65592,39.99185","queryType":7,"start":0,"count":10}&type=query&tk=56e3056c11d2a791484e789d494fcac1`, {});
   }
 
-  async getProjectInfo(params: {projectType?: string, company?: string}): Promise<ReverseReferenceCity<ProjectItem[]>> {
+  async getProjectInfo(params: {projectApprovalType?: string, entId?: string}): Promise<ReverseReferenceCity<ProjectItem[]>> {
     return this.post(divisionPath.getProjectInfo, { ...params });
   }
 

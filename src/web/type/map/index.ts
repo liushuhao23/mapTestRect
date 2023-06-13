@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-04-23 11:16:00
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-04-26 20:52:11
+ * @LastEditTime: 2023-06-13 14:44:04
  */
 export interface CityItem {
   name: string;
@@ -59,6 +59,7 @@ export interface ProjectItem {
   projType?: string;
   province?: string;
   systemFrom?: string;
+  id: string
 }
 
 export interface TypeItem {
