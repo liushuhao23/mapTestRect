@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-06-08 13:50:56
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 18:07:12
+ * @LastEditTime: 2023-06-13 23:05:11
  */
 import React, { useState, FC, useEffect } from 'react'
 import TiandituMap from './tianditu'
@@ -15,9 +15,10 @@ import { ProjectItem } from '@web/type/map';
 
 interface Props {
   getProdInfo: (id: number, info: ProjectItem) => void
+  getProList: (val: ProjectItem[]) => void
 }
 const SearchCom: FC<Props> = (props ) => {
-  const { getProdInfo } = props;
+  const { getProdInfo, getProList} = props;
 
   const [typeList, setTypeList] = useState([])
   const [entList, setEntListt] = useState([])
@@ -64,11 +65,13 @@ const SearchCom: FC<Props> = (props ) => {
 
   const getProjectInfoFun = (params?: { projectApprovalType: string; entId: string }) => {
     DivisionApi.getProjectInfo(params!).then((rs) => {
+      let target: ProjectItem[] = []
       if (rs.code === 200) {
-        setProList(rs.data)
+        target= rs.data
       } else {
-        setProList([])
+        target = []
       }
+      setProList(target)
     });
   };
 
@@ -85,6 +88,12 @@ const SearchCom: FC<Props> = (props ) => {
     };
     getProjectInfoFun(params);
   };
+
+  useEffect(() => {
+    if (proList.length) {
+      getProList(proList)
+    }
+  }, [proList])
 
   
   
@@ -135,14 +144,20 @@ const SearchCom: FC<Props> = (props ) => {
 
 const MapCom: FC = () => {
   const [infoData, setInfoData] = useState<ProjectItem | Record<string, any>>({})
+  const [proList, setProList] = useState<ProjectItem[]>([])
 
   const getProdInfo = (id: number, info: ProjectItem) => {
     setInfoData(info)
   }
+ 
+  const getProList = (val: ProjectItem[]) => {
+    console.log(8888888888888888888888)
+    setProList(val)
+  }
   return (
     <div className='h-full w-full'>
-      <SearchCom getProdInfo={getProdInfo}></SearchCom>
-      <TiandituMap info = {infoData as ProjectItem}></TiandituMap>
+      <SearchCom getProdInfo={getProdInfo} getProList= {getProList}></SearchCom>
+      <TiandituMap info = {infoData as ProjectItem} proList={proList}></TiandituMap>
     </div>
   )
 }
