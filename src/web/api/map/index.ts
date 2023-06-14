@@ -4,15 +4,14 @@
  * @Autor: liushuhao
  * @Date: 2023-04-23 11:16:10
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 14:23:41
+ * @LastEditTime: 2023-06-14 21:39:07
  */
 
-import ApiBase from '../../asstes/http/api';
+import ApiBase from '@assets/http/api';
 import { CityItem, TypeItem, ProjectItem, EntItem } from '@type/map';
 import { ReverseReferenceCity } from '@type/map/common';
 
 const mockUrl = '/gisconfig';
-
 const divisionPath = {
   cityList: '/division/api/v1/city/cityList',
   getDetail: '/division/api/v1/city/getDetail',

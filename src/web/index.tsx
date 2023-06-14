@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 10:48:41
+ * @LastEditTime: 2023-06-14 21:38:35
  */
 import './public-path'
 import App from '@pages/App';
@@ -15,7 +15,7 @@ import 'antd/dist/antd.css';
 // import './asstes/theme/index.less'
 import { emitter } from './mitt';
 import { CommunicationProtocol } from './common';
-import { getWorkspaceData } from './asstes/http/useHttp';
+import { getWorkspaceData } from './assets/http/useHttp';
 
 
 let root: any;

@@ -4,18 +4,17 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 23:26:57
+ * @LastEditTime: 2023-06-15 00:24:23
  */
 import React, { useState, FC, useEffect, useRef } from 'react';
 import 'ol/ol.css';
 import './tianditu.css';
-import { Map, View  } from 'ol';
-import { Icon, Style } from 'ol/style.js';
-import { Layer} from 'ol/layer.js';
+import { Map, View } from 'ol';
+import { Icon, Style, Text } from 'ol/style.js';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
-import VectorLayer from 'ol/layer/Vector'
-import VectorSource from 'ol/source/Vector'
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import XYZ from 'ol/source/XYZ';
 
 import TileLayer from 'ol/layer/Tile.js';
@@ -25,94 +24,147 @@ import { ProjectItem } from '@web/type/map';
 import { Fill, Stroke, Circle as sCircle } from 'ol/style';
 
 interface Props {
-    info: ProjectItem
-    proList: ProjectItem[]
+  info: ProjectItem;
+  proList: ProjectItem[];
 }
-// const urlObj: Record<string, any> = {
-//   设计: require('@assets/image/'),
-//   epc: require('@assets/image/epcIcon.png'),
-//   其他: require('@assets/image/otherIcon.png')
-// };
+// ../../assets/image/designIocn.png
+const urlObj: Record<string, any> = {
+  设计类: require('@assets/image/designIocn.png'),
+  // 设计类选中: require('@assets/image/designIocnChecked.png'),
+
+  EPC: require('@assets/image/epcIcon.png'),
+  // EPC选中: require('@assets/image/epcIconChecked.png'),
+  其他: require('@assets/image/otherIcon.png'),
+  // 其他选中: require('@assets/image/otherIconChecked.png')
+};
+let layerList: any[] = []
 
 
-
-const TiandituMap: FC<Props> = (props) => {
+const TiandituMap: FC<Props> = props => {
   const { info, proList } = props;
   let centerPos = fromLonLat([116.40769, 39.89945]);
   const mapCurrent = useRef(null);
-  let mapCurrents = useRef<any>(null)
+  let mapCurrents = useRef<any>(null);
   let map: any = null;
   const getInfo = async () => {
     const data = await DivisionApi.getOneLevel();
   };
-  let layerCurrnet = useRef<any>(null)
+
 
   const setIcon = (arr: ProjectItem[]) => {
-    if (arr.length) {
-      arr.forEach((item) => {
-        const style = new Style({
-          image: new Icon({
-            src: require('../../asstes/image/epcIcon.png')
-          })
-        })
-        const _style = new Style({
-          image: new sCircle({
-              radius: 10,
-              stroke: new Stroke({
-                  color: '#fff',
+    if (layerList.length) {
+      layerList.forEach(layer => {
+        mapCurrents.current.removeLayer(layer)
+      });
+      layerList = []
+    }
+      if (arr.length) {
+        arr.forEach(item => {
+          const style = new Style({
+            image: new Icon({
+              width: 37,
+              height: 34,
+              src: item.projApprovalType
+                ? urlObj[item.projApprovalType]
+                : require('../../assets/image/designIocn.png'),
+            }),
+          });
+          const textStyle = new Style({
+            text: new Text({
+              text: item.projName!?.length > 6 ? `${item.projName!.slice(0, 6)}...`: item.projName,
+              offsetY: 30,
+              backgroundStroke: new Stroke({
+                color: '#ffffff',
+              }),
+              backgroundFill: new Fill({
+                color: '#ffffff',
               }),
               fill: new Fill({
-                  color: '#3399CC',
+                color: '#333333'
               }),
-          }),
-      });
-        const feature = new Feature({
-            geometry: new Point(fromLonLat([Number(item.longitude), Number(item.latitude)]))
-        });
-        feature.setStyle(style);
-        const _marker = new VectorLayer({
-          source: new VectorSource({
+              font: '12px sans-serif',
+              padding: [1, 4, 1, 4]
+            })
+          })
+          const feature = new Feature({
+            geometry: new Point(fromLonLat([Number(item.longitude), Number(item.latitude)])),
+          });
+          const featureText = new Feature({
+            geometry: new Point(fromLonLat([Number(item.longitude ), Number(item.latitude)])),
+          })
+          feature.setProperties({
+            id: item.id,
+            name: item.projName,
+            item: item
+          });
+          featureText.setProperties({
+            id: item.id,
+            name: item.projName,
+            item: item
+          });
+          feature.setStyle(textStyle);
+          featureText.setStyle(style);
+          const _marker = new VectorLayer({
+            source: new VectorSource({
               features: [feature],
-          }),
-      });
-      mapCurrents.current.addLayer(_marker);
-      });
-    }
-  }
-  useEffect(() => {
+            }),
+          });
+          const _markerText = new VectorLayer({
+            source: new VectorSource({
+              features: [featureText],
+            }),
+          });
+          mapCurrents.current.addLayer(_marker);
+          mapCurrents.current.addLayer(_markerText);
+          layerList.push(_marker, _markerText)
+        });
+      }
+
+  };
+
+  const initMap = () => {
     mapCurrents.current = new Map({
       view: new View({
         center: centerPos, //地图中心位置
-        zoom: 10, //地图初始层级
+        zoom: 5, //地图初始层级
       }),
-      layers: [
-      ],
+      layers: [],
       target: mapCurrent.current!,
     });
     let tileLayer = new TileLayer({
       source: new XYZ({
-        url: 'http://t4.tianditu.com/DataServer?T=vec_w&tk=56e3056c11d2a791484e789d494fcac1&x={x}&y={y}&l={z}',
+        url: 'http://t4.tianditu.com/DataServer?T=vec_w&tk=e82abda816105f0b122bc32800e708ae&x={x}&y={y}&l={z}',
       }),
     });
+    tileLayer.set('_id', 'tileLayer')
     let tileLayerMark = new TileLayer({
       source: new XYZ({
-        url: 'http://t4.tianditu.com/DataServer?T=cva_w&tk=56e3056c11d2a791484e789d494fcac1&x={x}&y={y}&l={z}',
+        url: 'http://t4.tianditu.com/DataServer?T=cva_w&tk=e82abda816105f0b122bc32800e708ae&x={x}&y={y}&l={z}',
       }),
     });
+    tileLayerMark.set('_id', 'tileLayerMark')
     mapCurrents.current.addLayer(tileLayer);
     mapCurrents.current.addLayer(tileLayerMark);
-    console.log('输出', 'tianditutianditutianditutianditutianditutianditu', map);
-    // getInfo();
+    mapCurrents.current.on('click', function(event: { coordinate: any; pixel: any; }) {
+      // 获取点击的坐标
+      let clickedCoordinate = event.coordinate;
+      
+      mapCurrents.current.forEachFeatureAtPixel(event.pixel, function(feature: any) {
+        console.log('Clicked on feature:', feature);
+      });
+    });
+  }
+  useEffect(() => {
+    initMap()
   }, []);
   // useEffect(() => {
   // }, [props.info])
 
   useEffect(() => {
     if (proList.length) {
-      setIcon(proList)
+      setIcon(proList);
     }
-
-  }, [props.proList])
+  }, [props.proList]);
 
   return <div id="map" className="mapMontainer" ref={mapCurrent}></div>;
 };
