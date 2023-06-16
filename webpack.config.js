@@ -49,7 +49,7 @@ const webpackBaseConfig = {
         include: [resolve(__dirname, 'src'), resolve(__dirname, 'node_modules')],
         use: [
           MiniCssExtractPlugin.loader,
-          { loader: 'css-loader?modules&localIdentName=[name]_[local]-[hash:6]', options: { importLoaders: 1 } },
+          { loader: 'css-loader', options: { importLoaders: 1 } },
           'postcss-loader',
         ],
       },

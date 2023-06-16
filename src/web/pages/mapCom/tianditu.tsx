@@ -4,12 +4,12 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-15 00:24:23
+ * @LastEditTime: 2023-06-16 16:30:28
  */
 import React, { useState, FC, useEffect, useRef } from 'react';
 import 'ol/ol.css';
 import './tianditu.css';
-import { Map, View } from 'ol';
+import { Map, Overlay, View } from 'ol';
 import { Icon, Style, Text } from 'ol/style.js';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
@@ -44,11 +44,17 @@ const TiandituMap: FC<Props> = props => {
   const { info, proList } = props;
   let centerPos = fromLonLat([116.40769, 39.89945]);
   const mapCurrent = useRef(null);
+  const popupCurrent =useRef(null)
+  //  var content = document.getElementById("popup-content"); //显示弹出框具体内容的div
   let mapCurrents = useRef<any>(null);
   let map: any = null;
   const getInfo = async () => {
     const data = await DivisionApi.getOneLevel();
   };
+
+  const proPositioning = (info: ProjectItem) => {
+    console.log(info, 'proPositioning')
+  }
 
 
   const setIcon = (arr: ProjectItem[]) => {
@@ -147,18 +153,29 @@ const TiandituMap: FC<Props> = props => {
     mapCurrents.current.addLayer(tileLayerMark);
     mapCurrents.current.on('click', function(event: { coordinate: any; pixel: any; }) {
       // 获取点击的坐标
-      let clickedCoordinate = event.coordinate;
+     
       
       mapCurrents.current.forEachFeatureAtPixel(event.pixel, function(feature: any) {
+        let clickedCoordinate = event.coordinate;
         console.log('Clicked on feature:', feature);
+        const overlay = new Overlay({
+            //设置弹出框的容器
+            element: popupCurrent.current!,
+            //是否自动平移，即假如标记在屏幕边缘，弹出时自动平移地图使弹出框完全可见
+            autoPan: true
+        });
+        (popupCurrent.current! as HTMLElement).innerHTML = "<div className='w-[100px]'><Button type='primary'>Primary Button</Button></div> ";
+        overlay.setPosition(clickedCoordinate);
+        mapCurrents.current.addOverlay(overlay)
       });
     });
   }
   useEffect(() => {
     initMap()
   }, []);
-  // useEffect(() => {
-  // }, [props.info])
+  useEffect(() => {
+    proPositioning(props.info);
+  }, [props.info])
 
   useEffect(() => {
     if (proList.length) {
@@ -166,6 +183,13 @@ const TiandituMap: FC<Props> = props => {
     }
   }, [props.proList]);
 
-  return <div id="map" className="mapMontainer" ref={mapCurrent}></div>;
+  return <>
+    <div id="map" className="mapMontainer" ref={mapCurrent}></div>
+    <div id="popup" className="ol-popup" ref={popupCurrent}>
+      <a href="#" id="popup-closer" className="ol-popup-closer"></a>
+      <div id="popup-content"></div>
+    </div>
+  </>
+
 };
 export default TiandituMap;
