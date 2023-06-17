@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-16 16:30:28
+ * @LastEditTime: 2023-06-18 00:18:01
  */
 import React, { useState, FC, useEffect, useRef } from 'react';
 import 'ol/ol.css';
@@ -21,7 +21,9 @@ import TileLayer from 'ol/layer/Tile.js';
 import { fromLonLat } from 'ol/proj';
 import { DivisionApi } from '@web/api/map';
 import { ProjectItem } from '@web/type/map';
+import { Button, Popconfirm, Space, Tooltip } from 'antd';
 import { Fill, Stroke, Circle as sCircle } from 'ol/style';
+import ReactDOMServer from 'react-dom/server';
 
 interface Props {
   info: ProjectItem;
@@ -39,18 +41,19 @@ const urlObj: Record<string, any> = {
 };
 let layerList: any[] = []
 
-
 const TiandituMap: FC<Props> = props => {
   const { info, proList } = props;
   let centerPos = fromLonLat([116.40769, 39.89945]);
   const mapCurrent = useRef(null);
   const popupCurrent =useRef(null)
-  //  var content = document.getElementById("popup-content"); //显示弹出框具体内容的div
   let mapCurrents = useRef<any>(null);
+  const flagToop = useRef<boolean>(false)
+  const overlay = useRef<any>(null)
   let map: any = null;
   const getInfo = async () => {
     const data = await DivisionApi.getOneLevel();
   };
+  const [flag, setFlag] = useState(false)
 
   const proPositioning = (info: ProjectItem) => {
     console.log(info, 'proPositioning')
@@ -78,7 +81,7 @@ const TiandituMap: FC<Props> = props => {
           const textStyle = new Style({
             text: new Text({
               text: item.projName!?.length > 6 ? `${item.projName!.slice(0, 6)}...`: item.projName,
-              offsetY: 30,
+              // offsetY: 30,
               backgroundStroke: new Stroke({
                 color: '#ffffff',
               }),
@@ -96,20 +99,21 @@ const TiandituMap: FC<Props> = props => {
             geometry: new Point(fromLonLat([Number(item.longitude), Number(item.latitude)])),
           });
           const featureText = new Feature({
-            geometry: new Point(fromLonLat([Number(item.longitude ), Number(item.latitude)])),
+            geometry: new Point(fromLonLat([Number(item.longitude ), Number(item.latitude) - 1])),
           })
           feature.setProperties({
             id: item.id,
             name: item.projName,
+            type: 'feature',
             item: item
           });
-          featureText.setProperties({
-            id: item.id,
-            name: item.projName,
-            item: item
-          });
-          feature.setStyle(textStyle);
-          featureText.setStyle(style);
+          // featureText.setProperties({
+          //   id: item.id,
+          //   name: item.projName,
+          //   item: item
+          // });
+          feature.setStyle(style);
+          featureText.setStyle( textStyle);
           const _marker = new VectorLayer({
             source: new VectorSource({
               features: [feature],
@@ -120,8 +124,8 @@ const TiandituMap: FC<Props> = props => {
               features: [featureText],
             }),
           });
-          mapCurrents.current.addLayer(_marker);
           mapCurrents.current.addLayer(_markerText);
+          mapCurrents.current.addLayer(_marker);
           layerList.push(_marker, _markerText)
         });
       }
@@ -153,23 +157,33 @@ const TiandituMap: FC<Props> = props => {
     mapCurrents.current.addLayer(tileLayerMark);
     mapCurrents.current.on('click', function(event: { coordinate: any; pixel: any; }) {
       // 获取点击的坐标
+      // console.log('event', event)
      
       
       mapCurrents.current.forEachFeatureAtPixel(event.pixel, function(feature: any) {
-        let clickedCoordinate = event.coordinate;
-        console.log('Clicked on feature:', feature);
-        const overlay = new Overlay({
-            //设置弹出框的容器
-            element: popupCurrent.current!,
-            //是否自动平移，即假如标记在屏幕边缘，弹出时自动平移地图使弹出框完全可见
-            autoPan: true
-        });
-        (popupCurrent.current! as HTMLElement).innerHTML = "<div className='w-[100px]'><Button type='primary'>Primary Button</Button></div> ";
-        overlay.setPosition(clickedCoordinate);
-        mapCurrents.current.addOverlay(overlay)
+        console.log(feature, 'feature')
+        if (feature.values_?.type === "feature") {
+          console.log(feature.getGeometry(), 'getGeometry')
+          const { flatCoordinates } = feature.getGeometry();
+          let clickedCoordinate = event.coordinate;
+          mapCurrents.current!.removeOverlay(overlay.current)
+          overlay.current = new Overlay({
+              positioning: 'top-right',
+              stopEvent: false,
+              //设置弹出框的容器
+              element: popupCurrent.current!,
+              //是否自动平移，即假如标记在屏幕边缘，弹出时自动平移地图使弹出框完全可见
+              autoPan: true
+          });
+          setFlag(true)
+          flagToop.current = true;
+          overlay.current.setPosition(flatCoordinates);
+          mapCurrents.current.addOverlay(overlay.current)
+        }
       });
-    });
+    });  
   }
+
   useEffect(() => {
     initMap()
   }, []);
@@ -183,13 +197,27 @@ const TiandituMap: FC<Props> = props => {
     }
   }, [props.proList]);
 
-  return <>
-    <div id="map" className="mapMontainer" ref={mapCurrent}></div>
-    <div id="popup" className="ol-popup" ref={popupCurrent}>
-      <a href="#" id="popup-closer" className="ol-popup-closer"></a>
-      <div id="popup-content"></div>
+
+  return (
+    <div id="map" className="mapMontainer" ref={mapCurrent}>
+      <div id='popupCurrent' ref={popupCurrent}>
+        {
+          flag && <Tooltip destroyTooltipOnHide={true} getPopupContainer={() => popupCurrent.current!	} open={flag} title={<TestCom></TestCom>}></Tooltip>
+        }
+      </div>
     </div>
-  </>
+  )
+
+
+
+  // </boolean>
 
 };
+
+const TestCom: FC  =() => {
+  const onClick = () => {
+    console.log(2222)
+  }
+  return  <Button type="primary" onClick={onClick}>Primary Button</Button>
+}
 export default TiandituMap;
