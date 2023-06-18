@@ -4,11 +4,11 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-18 00:18:01
+ * @LastEditTime: 2023-06-18 23:03:45
  */
 import React, { useState, FC, useEffect, useRef } from 'react';
 import 'ol/ol.css';
-import './tianditu.css';
+import './tianditu.less';
 import { Map, Overlay, View } from 'ol';
 import { Icon, Style, Text } from 'ol/style.js';
 import { Feature } from 'ol';
@@ -29,6 +29,9 @@ interface Props {
   info: ProjectItem;
   proList: ProjectItem[];
 }
+// interface InfoPopProps {
+//   info: info
+// }
 // ../../assets/image/designIocn.png
 const urlObj: Record<string, any> = {
   设计类: require('@assets/image/designIocn.png'),
@@ -43,12 +46,14 @@ let layerList: any[] = []
 
 const TiandituMap: FC<Props> = props => {
   const { info, proList } = props;
+  const [ proInfo, setProInfo ] = useState<ProjectItem | Record<string, any>>({})
   let centerPos = fromLonLat([116.40769, 39.89945]);
   const mapCurrent = useRef(null);
   const popupCurrent =useRef(null)
   let mapCurrents = useRef<any>(null);
   const flagToop = useRef<boolean>(false)
   const overlay = useRef<any>(null)
+  const featureObject = useRef<any>({})
   let map: any = null;
   const getInfo = async () => {
     const data = await DivisionApi.getOneLevel();
@@ -57,10 +62,16 @@ const TiandituMap: FC<Props> = props => {
 
   const proPositioning = (info: ProjectItem) => {
     console.log(info, 'proPositioning')
+    if (Object.keys(info).length) {
+      const featureCurrent = featureObject.current[info.id]
+      setProInfo(info)
+      createOverlay(featureCurrent)
+    }
   }
 
 
   const setIcon = (arr: ProjectItem[]) => {
+    featureObject.current = {}
     if (layerList.length) {
       layerList.forEach(layer => {
         mapCurrents.current.removeLayer(layer)
@@ -107,11 +118,7 @@ const TiandituMap: FC<Props> = props => {
             type: 'feature',
             item: item
           });
-          // featureText.setProperties({
-          //   id: item.id,
-          //   name: item.projName,
-          //   item: item
-          // });
+          featureObject.current[item.id] = feature
           feature.setStyle(style);
           featureText.setStyle( textStyle);
           const _marker = new VectorLayer({
@@ -156,38 +163,37 @@ const TiandituMap: FC<Props> = props => {
     mapCurrents.current.addLayer(tileLayer);
     mapCurrents.current.addLayer(tileLayerMark);
     mapCurrents.current.on('click', function(event: { coordinate: any; pixel: any; }) {
-      // 获取点击的坐标
-      // console.log('event', event)
-     
-      
       mapCurrents.current.forEachFeatureAtPixel(event.pixel, function(feature: any) {
-        console.log(feature, 'feature')
         if (feature.values_?.type === "feature") {
-          console.log(feature.getGeometry(), 'getGeometry')
-          const { flatCoordinates } = feature.getGeometry();
-          let clickedCoordinate = event.coordinate;
-          mapCurrents.current!.removeOverlay(overlay.current)
-          overlay.current = new Overlay({
-              positioning: 'top-right',
-              stopEvent: false,
-              //设置弹出框的容器
-              element: popupCurrent.current!,
-              //是否自动平移，即假如标记在屏幕边缘，弹出时自动平移地图使弹出框完全可见
-              autoPan: true
-          });
-          setFlag(true)
-          flagToop.current = true;
-          overlay.current.setPosition(flatCoordinates);
-          mapCurrents.current.addOverlay(overlay.current)
+          console.log('输出', feature.values_.item )
+          setProInfo(feature.values_.item)
+          createOverlay(feature)
+
         }
       });
     });  
+  }
+
+  const createOverlay = (feature: any) => {
+    const { flatCoordinates } = feature.getGeometry();
+    mapCurrents.current!.removeOverlay(overlay.current)
+    overlay.current = new Overlay({
+        stopEvent: false,
+        offset: [0, -5],
+        element: popupCurrent.current!,
+        autoPan: true
+    });
+    setFlag(true)
+    flagToop.current = true;
+    overlay.current.setPosition(flatCoordinates);
+    mapCurrents.current.addOverlay(overlay.current)
   }
 
   useEffect(() => {
     initMap()
   }, []);
   useEffect(() => {
+    console.log('输出',  props.info)
     proPositioning(props.info);
   }, [props.info])
 
@@ -200,24 +206,29 @@ const TiandituMap: FC<Props> = props => {
 
   return (
     <div id="map" className="mapMontainer" ref={mapCurrent}>
-      <div id='popupCurrent' ref={popupCurrent}>
+      <div id='popupCurrent'  ref={popupCurrent}>
         {
-          flag && <Tooltip destroyTooltipOnHide={true} getPopupContainer={() => popupCurrent.current!	} open={flag} title={<TestCom></TestCom>}></Tooltip>
+          flag && <Tooltip  overlayStyle={ {'width':  '320px', 'maxWidth': '300px', 'padding': 0}} color={'#ffffff'} destroyTooltipOnHide={true} getPopupContainer={() => popupCurrent.current!	} open={flag} title={<InfoPop info={proInfo as ProjectItem}></InfoPop>}></Tooltip>
         }
       </div>
     </div>
   )
-
-
-
-  // </boolean>
-
 };
 
-const TestCom: FC  =() => {
-  const onClick = () => {
-    console.log(2222)
-  }
-  return  <Button type="primary" onClick={onClick}>Primary Button</Button>
+const InfoPop: FC<Pick<Props, 'info'>>  =(props) => {
+  const {info} = props
+  return  <>
+    <div className="mapPopInfo relative w-[300px] h-[285px] bg-[#FFFFFF] rounded-[8px] z-[998]">
+      <div className="w-[300px] h-[172px] rounded-[8px]">
+        <img className='w-full h-full' src={info.projectUrl ? info.projectUrl : require('@assets/image/bgd.jpeg')} alt="" />
+      </div>
+      <div className="pt-[5px] pr-[5px] pb-[0px] pl-[20px]">
+        <div className="text-[#2A334A] text-[18px] font-[600] leading-[28px] tracking-normal text-left mr-[5px]">{info.projName}</div>
+        <div className="text-[#47516A] text-[14px] font-[400] leading-[21px] tracking-normal text-left mr-[5px]"> {info.projApprovalType} | {info.projType}</div>
+        <div className="text-[#47516A] text-[14px] font-[400] leading-[21px] tracking-normal text-left mr-[5px]">{info.projRegion}</div>
+        <div className="text-[#6D7B98] text-[12px] font-[400] leading-[20px] tracking-normal text-left">{info.projAddress ? info.projAddress : ''}</div>
+      </div>
+    </div>
+  </>
 }
 export default TiandituMap;
