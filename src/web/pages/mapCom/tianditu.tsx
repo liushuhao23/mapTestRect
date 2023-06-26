@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-18 23:03:45
+ * @LastEditTime: 2023-06-26 23:06:50
  */
 import React, { useState, FC, useEffect, useRef } from 'react';
 import 'ol/ol.css';
@@ -23,15 +23,14 @@ import { DivisionApi } from '@web/api/map';
 import { ProjectItem } from '@web/type/map';
 import { Button, Popconfirm, Space, Tooltip } from 'antd';
 import { Fill, Stroke, Circle as sCircle } from 'ol/style';
+import { CloseOutlined } from '@ant-design/icons';
 import ReactDOMServer from 'react-dom/server';
 
 interface Props {
   info: ProjectItem;
   proList: ProjectItem[];
+  closeOverlay: () => void
 }
-// interface InfoPopProps {
-//   info: info
-// }
 // ../../assets/image/designIocn.png
 const urlObj: Record<string, any> = {
   设计类: require('@assets/image/designIocn.png'),
@@ -156,7 +155,7 @@ const TiandituMap: FC<Props> = props => {
     tileLayer.set('_id', 'tileLayer')
     let tileLayerMark = new TileLayer({
       source: new XYZ({
-        url: 'http://t4.tianditu.com/DataServer?T=cva_w&tk=e82abda816105f0b122bc32800e708ae&x={x}&y={y}&l={z}',
+        url: 'http:// /DataServer?T=cva_w&tk=e82abda816105f0b122bc32800e708ae&x={x}&y={y}&l={z}',
       }),
     });
     tileLayerMark.set('_id', 'tileLayerMark')
@@ -165,21 +164,20 @@ const TiandituMap: FC<Props> = props => {
     mapCurrents.current.on('click', function(event: { coordinate: any; pixel: any; }) {
       mapCurrents.current.forEachFeatureAtPixel(event.pixel, function(feature: any) {
         if (feature.values_?.type === "feature") {
-          console.log('输出', feature.values_.item )
           setProInfo(feature.values_.item)
           createOverlay(feature)
-
         }
       });
     });  
   }
 
   const createOverlay = (feature: any) => {
+    console.log('输出createOverlay',  )
     const { flatCoordinates } = feature.getGeometry();
     mapCurrents.current!.removeOverlay(overlay.current)
     overlay.current = new Overlay({
         stopEvent: false,
-        offset: [0, -5],
+        offset: [0, -25],
         element: popupCurrent.current!,
         autoPan: true
     });
@@ -187,13 +185,17 @@ const TiandituMap: FC<Props> = props => {
     flagToop.current = true;
     overlay.current.setPosition(flatCoordinates);
     mapCurrents.current.addOverlay(overlay.current)
+    mapCurrents.current.getView().animate({zoom: 8, center: flatCoordinates, duration: 500} )
+  }
+
+  const closeOverlay = () => {
+    mapCurrents.current!.removeOverlay(overlay.current)
   }
 
   useEffect(() => {
     initMap()
   }, []);
   useEffect(() => {
-    console.log('输出',  props.info)
     proPositioning(props.info);
   }, [props.info])
 
@@ -208,18 +210,24 @@ const TiandituMap: FC<Props> = props => {
     <div id="map" className="mapMontainer" ref={mapCurrent}>
       <div id='popupCurrent'  ref={popupCurrent}>
         {
-          flag && <Tooltip  overlayStyle={ {'width':  '320px', 'maxWidth': '300px', 'padding': 0}} color={'#ffffff'} destroyTooltipOnHide={true} getPopupContainer={() => popupCurrent.current!	} open={flag} title={<InfoPop info={proInfo as ProjectItem}></InfoPop>}></Tooltip>
+          flag && <Tooltip  overlayStyle={ {'width':  '320px', 'maxWidth': '300px', 'padding': 0}} color={'#ffffff'}  destroyTooltipOnHide={true} getPopupContainer={() => popupCurrent.current!	} open={flag} title={<InfoPop closeOverlay={ closeOverlay } info={proInfo as ProjectItem}></InfoPop>}></Tooltip>
         }
       </div>
     </div>
   )
 };
 
-const InfoPop: FC<Pick<Props, 'info'>>  =(props) => {
-  const {info} = props
+const InfoPop: FC<Pick<Props, 'info' | 'closeOverlay'>>  =(props) => {
+  const {info, closeOverlay} = props
+  const closeInfoPop = () => {
+    closeOverlay()
+  }
   return  <>
     <div className="mapPopInfo relative w-[300px] h-[285px] bg-[#FFFFFF] rounded-[8px] z-[998]">
-      <div className="w-[300px] h-[172px] rounded-[8px]">
+      <div className='absolute top-[2px] right-[5px] cursor-pointer'>
+        <CloseOutlined onClick={closeInfoPop}/>
+      </div>
+      <div className="w-[300px] h-[172px] rounded-[8px] ">
         <img className='w-full h-full' src={info.projectUrl ? info.projectUrl : require('@assets/image/bgd.jpeg')} alt="" />
       </div>
       <div className="pt-[5px] pr-[5px] pb-[0px] pl-[20px]">

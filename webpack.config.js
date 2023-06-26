@@ -55,7 +55,7 @@ const webpackBaseConfig = {
       },
       {
         test: /\.less$/,
-        include: [resolve(__dirname, 'src'), resolve(__dirname, 'node_modules')],
+        // include: [resolve(__dirname, 'src'), resolve(__dirname, 'node_modules')],
         use: [
           MiniCssExtractPlugin.loader,
           { loader: 'css-loader?modules&localIdentName=[name]_[local]-[hash:6]', options: { importLoaders: 1 } },
@@ -63,6 +63,9 @@ const webpackBaseConfig = {
             loader: 'less-loader',
             options: {
               lessOptions: {
+                  modifyVars: {
+                    '@ant-prefix': 'jiuzhoumap'
+                  },
                   javascriptEnabled: true
               }
             }

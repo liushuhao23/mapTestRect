@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-28 23:23:42
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-11 20:00:08
+ * @LastEditTime: 2023-06-26 22:38:27
  */
 import { useRoutes } from 'react-router-dom';
 import routes from '../routers';
@@ -22,6 +22,7 @@ const LayoutsMain = (): JSX.Element => {
             id= 'mainContent'
             style={{
               minHeight: 280,
+              height: '100%'
             }}
           >
             {routing}

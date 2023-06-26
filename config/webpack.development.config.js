@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:08
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-12 09:27:58
+ * @LastEditTime: 2023-06-26 20:59:24
  */
 const { join, resolve } = require('path');
 const FriendlyErrorsWebpackPlugin = require('@soda/friendly-errors-webpack-plugin');
@@ -15,6 +15,23 @@ const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
 
 const prot = 3004;
+const isBx = process.env.BX
+
+const getHeader = () => {
+  let header = {};
+  isBx
+    ? (header = {
+        'Access-Control-Allow-Origin': 'http://localhost:4001',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,POST,PUT,DELETE',
+        'Access-Control-Allow-Headers': 'citycode,cityid,session,cbim-cityid,cbim-citycode,entid,env,accountid,appcode,applicationname,sessionkey,session-key,cbim-projectid,cbim-accountid,DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,XRequested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,Uc-Authorization'
+      })
+    : (header = {
+        'Access-Control-Allow-Origin': '*'
+      });
+  return header;
+};
+
 module.exports = {
   output: {
     publicPath: `/${process.env.APP_PUBLIC_PATH}/`,
@@ -23,9 +40,7 @@ module.exports = {
     historyApiFallback: {
       index: `/${ process.env.APP_PUBLIC_PATH }/index.html`
     },
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
+    headers:  getHeader(),
     client: {
       logging: 'info',
     },
