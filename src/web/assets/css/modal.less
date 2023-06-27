@@ -1,0 +1,197 @@
+/*
+* 弹窗样式
+ */
+
+.jiuzhoumap-modal-wrap{
+  .jiuzhoumap-modal {
+    background: #f6f9fc; 
+    padding-bottom: 0; 
+    border-radius: 6px;
+    .jiuzhoumap-modal-header {
+      background: #f6f9fc;
+      border-bottom: none;
+      border-radius: 6px 6px 1px 1px;
+      .jiuzhoumap-modal-title{
+        line-height: 30px;
+      }
+    }
+    .jiuzhoumap-modal-content{
+      background: #f6f9fc;
+      border-radius: 6px;
+    }
+    .jiuzhoumap-modal-body {
+      padding: 20px 24px 0 24px;
+    }
+    .jiuzhoumap-modal-footer {
+      border-top: none;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 10px 24px;
+      border-radius: 1px 1px 6px 6px;
+      button{
+        margin: 0;
+        font-size: 14px;
+        padding: 0;
+        width: 68px;
+        height: 32px;
+        border-radius: 4px;
+      }
+      // 确定按钮
+      .jiuzhoumap-btn-primary{
+        //background: red;
+        background:#0084ff;
+        border-color: transparent;
+        color: #ffffff;
+      }
+    }
+    //弹框内form
+    .jiuzhoumap-form{
+      .jiuzhoumap-form-item{
+        &:nth-last-child(1){
+          //margin-bottom: 0;
+        }
+      }
+      //form-label
+      .jiuzhoumap-form-item-label{
+        label{
+          font-size: 14px;
+          font-family: PingFangSC, PingFangSC-Regular;
+          font-weight: 400;
+          margin-right: 10px;
+          color: #47516a;
+          &:after{
+            content: "";
+            position: relative;
+            top: -0.5px;
+            margin: 0 8px 0 2px;
+          }
+        }
+      }
+      //输入框input、textarea文本框
+      .input-wrap,.textarea-wrap{
+        background: rgba(201,210,225,0.30);
+        border-radius: 4px;
+        border-color: rgba(201, 210, 225, 0.3);
+        font-weight: 400;
+        text-align: left;
+        color: #2a334a;
+        textarea{
+          background: transparent;
+          border: none;
+          resize: none;
+        }
+      }
+      .input-wrap{
+        height: 32px;
+        .jiuzhoumap-input-suffix {
+          font-size: 10px;
+        }
+      }
+      // input获取焦点样式
+      .jiuzhoumap-input-affix-wrapper-focused {
+        box-shadow: 0 0 0 2px var(--jiuzhoumap-primary-color-outline);
+      }
+       //input、textarea 验证错误样式
+      .jiuzhoumap-form-item-has-error {
+        .jiuzhoumap-input-affix-wrapper {
+          background: rgba(201,210,225,0.30);
+          border: 1px solid var(--jiuzhoumap-error-color)!important;
+          outline: 0;
+          &:hover {
+            background: rgba(201,210,225,0.30);
+          }
+        }
+        .jiuzhoumap-input-affix-wrapper-focused {
+          box-shadow: 0 0 0 2px var(--jiuzhoumap-error-color-outline);
+        }
+        .jiuzhoumap-input {
+          background: transparent;
+          &:hover {
+            background: transparent;
+          }
+        }
+        textarea{
+          background: transparent;
+          outline: 0;
+          &:hover {
+            background: transparent;
+          }
+        }
+        .jiuzhoumap-picker:not([disabled]){
+          &:hover {
+            background: rgba(201, 210, 225, 0.3);
+          }
+        }
+      }
+      //select下拉框
+      .jiuzhoumap-select-single:not(.jiuzhoumap-select-customize-input) .jiuzhoumap-select-selector{
+        background: rgba(201,210,225,0.30);
+        border-color:rgba(201, 210, 225, 0.3);
+        border-radius: 4px;
+      }
+    }
+  }
+  // 删除二次提示
+  .jiuzhoumap-modal-confirm{
+    .jiuzhoumap-modal-body {
+      padding: 18px;
+      .jiuzhoumap-modal-confirm-body {
+        .jiuzhoumap-modal-confirm-title {
+          font-size: 16px;
+          font-family: PingFangSC, PingFangSC-Medium;
+          font-weight: 500;
+          color: #181e2d;
+        }
+        .jiuzhoumap-modal-confirm-content {
+          margin-top: 38px;
+          font-size: 14px;
+          font-family: PingFangSC, PingFangSC-Regular;
+          font-weight: 400;
+          color: #47516a;
+        }
+      }
+      .jiuzhoumap-modal-confirm-btns {
+        margin-top: 38px;
+        button{
+          // 再想想按钮
+          &:nth-child(1) {
+            width: 74px;
+            height: 32px;
+            background: #ffffff;
+            border: 1px solid #e1e6f1;
+            border-radius: 4px;
+          }
+          // 删除按钮
+          &:nth-child(2) {
+            width: 68px;
+            height: 32px;
+            background: #f43030;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+//全屏弹窗
+.full-modal {
+  .jiuzhoumap-modal {
+    max-width: 100%;
+    height: 100vh;
+    top: 0;
+    padding-bottom: 0;
+    margin: 0;
+  }
+  .jiuzhoumap-modal-content {
+    height: 100vh;
+    background: #e1e6f1 !important;
+  }
+  .jiuzhoumap-modal-body {
+    padding: 0!important;
+    height: 100vh;
+  }
+}

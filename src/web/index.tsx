@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-26 21:17:22
+ * @LastEditTime: 2023-06-27 16:30:05
  */
 import './public-path'
 import App from '@pages/App';
@@ -17,12 +17,16 @@ import { emitter } from './mitt';
 import { CommunicationProtocol } from './common';
 import { getWorkspaceData } from './assets/http/useHttp';
 import { ConfigProvider } from 'antd';
+import '@assets/reset.css'
+import '@assets/css/index.less'
+import '@assets/svg/iconfont';
+import '@assets/svg/iconfont.css';
 
 
 let root: any;
 function render(props: any) {
   const { container } = props;
-  // emitter.on('getWorkspaceData', getWorkspaceData)
+  emitter.on('getWorkspaceData', getWorkspaceData)
   root = createRoot(container? container.querySelector('#app')! : document.querySelector('#app'));
   root.render(
     <BrowserRouter basename={window.__POWERED_BY_QIANKUN__ ? '/city' : '/'} >

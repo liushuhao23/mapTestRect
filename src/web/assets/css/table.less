@@ -1,0 +1,85 @@
+/*
+* table样式
+*/
+.jiuzhoumap-table{
+  //表格表头
+  .jiuzhoumap-table-header {
+    background: rgba(225,230,241,0.60);
+  }
+  .jiuzhoumap-table-thead > tr > th{
+    background: rgba(225,230,241,0.60);
+    background: #e8ebf3;
+    font-size: 14px;
+    font-family: PingFangSC, PingFangSC-Medium;
+    font-weight: 500;
+    color: #2a334a;
+    //表头筛选图标 如需使用此样式请先添加组建内自定义图标标签。
+    .jiuzhoumap-table-filter-trigger:hover{
+      background: transparent;
+    }
+    .jiuzhoumap-table-filter-column{
+      justify-content: flex-start;
+      .jiuzhoumap-table-column-title{
+        flex: none;
+      }
+    }
+  }
+  //表格行通用
+  .jiuzhoumap-table-tbody > tr > td {
+    font-size: 14px;
+    font-family: PingFangSC, PingFangSC-Regular;
+    font-weight: 400;
+    color: #2a334a;
+    background: #ffffff;
+    box-shadow: 0px -1px 0px 0px #e6ebf0 inset;
+  }
+  .jiuzhoumap-table-tbody > tr.jiuzhoumap-table-row-selected:hover > td {
+    background: #fafafa!important;
+  }
+  .jiuzhoumap-table-thead > tr > th.jiuzhoumap-table-selection-column::before {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 0.5px;
+    height: 1.6em;
+    background-color: rgba(0, 0, 0, 0.06);
+    transform: translateY(-50%);
+    transition: background-color 0.3s;
+    content: '';
+  }
+  //状态小图标样式(启用时) ：如需使用改样式请自行加小图标标签标签并绑定动态class为enable-identity
+  //状态小图标样式(启用时 绿色) ：如需使用改样式请自行加小图标标签标签并绑定动态class为enable-identity
+  .enable-identity{
+    background: #00be71;
+  }
+  //状态小图标样式(禁用时 红色) ：如需使用改样式请自行加小图标标签并绑定动态class为deactivate-identity
+  .deactivate-identity{
+    background: red;
+  }
+  //状态小图标样式(灰色) ：如需使用改样式请自行加小图标标签并绑定动态class为deactivate-identity
+  .wait-identity{
+    background: #c9d2e1;
+  }
+}
+.jiuzhoumap-table-cell-scrollbar {
+  box-shadow: none;
+}
+// 表格上方右侧功能按钮基础样式
+.jiuzhoumap-btn-primary{
+  background: #0084ff;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: PingFangSC, PingFangSC-Regular;
+  font-weight: 400;
+}
+// 表格缩略图
+.thumbnailImg {
+  display: inline-block;
+  object-fit: cover;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+.jiuzhoumap-table-thead > tr > th:nth-last-child(2)::before {
+  display: none;
+}

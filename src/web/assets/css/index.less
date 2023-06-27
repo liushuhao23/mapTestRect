@@ -1,0 +1,274 @@
+/* 弹窗样式*/
+@import "./modal.less";
+
+/* 表格样式*/
+@import "./table.less";
+// map 选择城市弹出框
+@import "./popover.less";
+
+
+
+/*
+* 公共样式
+*/
+
+//input搜索框
+
+.jiuzhoumap-input-affix-wrapper{
+  padding: 5px 12px;
+  background: rgba(201, 210, 225, 0.3);
+  border: none;
+  border-radius: 4px;
+  .jiuzhoumap-input{
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+  }
+
+  .anticon svg{
+    margin-right: 3px;
+  }
+}
+.search-icon {
+  display: block;
+  height: 20px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+// input获取焦点
+.jiuzhoumap-input-affix-wrapper-focused {
+  background-color: #fff!important;
+  background: #fff!important;
+  box-shadow: 0px 10px 24px 0px rgba(157, 170, 194, 0.2)!important;
+}
+
+.jiuzhoumap-input:focus {
+  background-color: #fff!important;
+  background: #fff!important;
+  box-shadow: 0px 10px 24px 0px rgba(157, 170, 194, 0.2)!important;
+}
+.jiuzhoumap-input{
+  &::placeholder {
+    color: #9DAAC2;
+  }
+}
+.jiuzhoumap-modal-wrap .jiuzhoumap-modal .jiuzhoumap-form .input-wrap, .jiuzhoumap-modal-wrap .jiuzhoumap-modal .jiuzhoumap-form .textarea-wrap {
+  background: rgba(201, 210, 225, 0.3);
+}
+// input 禁选样式
+.jiuzhoumap-input[disabled] {
+  background: rgba(201,210,225,0.50);
+  border: 1px solid #c9d2e1;
+}
+.jiuzhoumap-cascader-menu-item-active:not(.jiuzhoumap-cascader-menu-item-disabled), .jiuzhoumap-cascader-menu-item-active:not(.jiuzhoumap-cascader-menu-item-disabled):hover {
+  background-color: #F6F9FC;
+}
+.jiuzhoumap-cascader-menu-item:hover {
+  background-color: #F6F9FC;
+}
+// textarea
+.jiuzhoumap-form-item-has-error {
+  .jiuzhoumap-input-textarea > .jiuzhoumap-input {
+    background-color: rgba(201, 210, 225, 0.3)!important;
+    border: 1px solid #ff4d4f!important;
+  }
+  .jiuzhoumap-select-selector {
+    border: 1px solid #ff4d4f!important;
+  }
+}
+
+.jiuzhoumap-input-textarea-show-count{
+  &:after{
+    margin-top: -22px!important;
+    margin-right: 12px!important;
+    font-size: 12px!important;
+  }
+  .jiuzhoumap-input {
+    // border: none;
+    // background: rgba(201, 210, 225, 0.3);
+  }
+  .jiuzhoumap-input:focus {
+    background-color: #fff!important;
+  }
+}
+//select下拉框
+.jiuzhoumap-select-selection-placeholder {
+  color: #9DAAC2;
+}
+.jiuzhoumap-select-single .jiuzhoumap-select-selector{
+  padding: 0 12px!important;
+}
+.jiuzhoumap-select-focused:not(.jiuzhoumap-select-disabled).jiuzhoumap-select:not(.jiuzhoumap-select-customize-input) .jiuzhoumap-select-selector {
+  background-color: #fff;
+  background: #fff;
+  box-shadow: none;
+}
+.jiuzhoumap-select-item-option-selected:not(.jiuzhoumap-select-item-option-disabled) {
+  background-color: #fff !important;
+  font-weight: 400 !important;
+  color: #0a87f5 !important;
+}
+.jiuzhoumap-select-item-option-active:not(.jiuzhoumap-select-item-option-disabled) {
+  background-color: #f6f9fc;
+}
+//  下拉多选背景色
+.jiuzhoumap-select-multiple .jiuzhoumap-select-selection-item{
+  background: rgba(201,210,225,0.60);
+  border-radius: 4px;
+}
+// 下拉框清除图标去掉背景色
+.jiuzhoumap-select-clear{
+  background: none;
+}
+/* 滚动条自动显示 */
+.scroll_auto{
+  overflow-y: hidden;
+}
+.scroll_auto:hover{
+  overflow-y: auto;
+}
+.scroll_overlay {
+  overflow-y: hidden;
+}
+.scroll_overlay:hover {
+  overflow-y: overlay;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #c9d2e1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9daac2;
+}
+
+::-webkit-scrollbar-track {
+  display: none;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+  background: transparent;
+  border-radius: 3px;
+}
+
+/* 滚动条轨道点击状态*/
+::-webkit-scrollbar-track-piece:active {
+  opacity: 0.1;
+  background: rgba(246, 93, 48, 0.5);
+}
+
+.jiuzhoumap-table-selection {
+  .jiuzhoumap-checkbox-indeterminate {
+    .jiuzhoumap-checkbox-inner{
+      background-color:#e7ebf4
+    }
+    .jiuzhoumap-checkbox-inner::after {
+      width: 12px;
+      height: 2px
+    }
+  }
+
+
+}
+// 按钮禁选样式
+.jiuzhoumap-btn-link[disabled], .jiuzhoumap-btn-link[disabled]:hover, .jiuzhoumap-btn-link[disabled]:focus, .jiuzhoumap-btn-link[disabled]:active {
+  opacity: 0.6;
+  font-size: 14px;
+  font-weight: 400;
+  color: #0084ff;
+}
+.jiuzhoumap-btn-primary[disabled], .jiuzhoumap-btn-primary[disabled]:hover, .jiuzhoumap-btn-primary[disabled]:focus, .jiuzhoumap-btn-primary[disabled]:active {
+  opacity: 0.6;
+  background: #0084ff!important;
+  border: none;
+  color: #fff;
+}
+.jiuzhoumap-popover-inner {
+  border-radius: 4px;
+}
+
+// 分页样式
+.jiuzhoumap-select:not(.jiuzhoumap-select-customize-input) .jiuzhoumap-select-selector {
+  border:none;
+  // background: rgba(201,210,225,0.30);
+}
+
+.jiuzhoumap-pagination-item, .jiuzhoumap-pagination-prev, .jiuzhoumap-pagination-next {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  line-height: 26px;
+  border:none;
+  border-radius: 4px;
+  background: rgba(201,210,225,0.30);
+}
+.jiuzhoumap-pagination-prev, .jiuzhoumap-pagination-next {
+  button {
+    border-radius: 4px;
+    background: rgba(201,210,225,0.30);
+
+  }
+}
+.jiuzhoumap-pagination-prev .jiuzhoumap-pagination-item-link, .jiuzhoumap-pagination-next .jiuzhoumap-pagination-item-link {
+  border:none;
+  border-radius: 4px;
+  background: rgba(201,210,225,0.30);
+}
+.jiuzhoumap-pagination-disabled .jiuzhoumap-pagination-item-link, .jiuzhoumap-pagination-disabled:hover .jiuzhoumap-pagination-item-link {
+  border:none;
+  border-radius: 4px;
+  background: rgba(201,210,225,0.30);
+}
+
+.jiuzhoumap-pagination-item-active {
+  background-color: #0a87f5;
+  border-radius: 4px;
+  a {
+    color: #333333
+  }
+}
+.jiuzhoumap-pagination-options {
+  .jiuzhoumap-select-single:not(.jiuzhoumap-select-customize-input) .jiuzhoumap-select-selector {
+    height: 28px;
+  }
+}
+//table删选样式
+.screen {
+  top: 45px!important;
+  .jiuzhoumap-popover-inner {
+    border-radius: 4px;
+    .jiuzhoumap-popover-title {
+      min-width: 138px;
+      border: none;
+      font-size: 12px;
+      color: #6d7b98;
+      line-height: 32px;
+      padding: 5px 12px 4px
+    }
+    .jiuzhoumap-popover-inner-content {
+      padding: 0 14px 14px 14px;
+    }
+  }
+  .jiuzhoumap-popover-arrow {
+    opacity: 0;
+  }
+}
+
+  .jiuzhoumap-table-filter-dropdown-btns {
+    border-top: 0px !important;
+  }
+ .jiuzhoumap-dropdown-menu-item-selected {
+    background-color: #fff !important;
+  }
+
+
+
+
+
+
