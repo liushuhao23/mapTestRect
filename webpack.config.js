@@ -76,11 +76,7 @@ const webpackBaseConfig = {
       {
         test: /\.(png|jpg|svg)$/,
         type: 'asset',
-      },
-      // {
-      //   resourceQuery: /raw-lingui/,
-      //   type: 'javascript/auto',
-      // },
+      }
     ],
   },
   optimization: {
@@ -94,7 +90,6 @@ const webpackBaseConfig = {
     },
   },
   resolve: {
-    // fallback: { url: false, os: false },
     alias: {
       '@components': resolve('src/web/components'),
       '@hooks': resolve('src/web/hooks'),
@@ -125,7 +120,6 @@ const webpackBaseConfig = {
     // }),
     new CleanWebpackPlugin(),
     new WebpackBar(),
-    // new Dotenv(),
   ],
 };
 module.exports = merge.default(webpackBaseConfig, _mergeConfig);

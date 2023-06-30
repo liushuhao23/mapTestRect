@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:08
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-26 20:59:24
+ * @LastEditTime: 2023-06-30 16:56:15
  */
 const { join, resolve } = require('path');
 const FriendlyErrorsWebpackPlugin = require('@soda/friendly-errors-webpack-plugin');
@@ -60,11 +60,6 @@ module.exports = {
           '^/tianshan': ''
         }
       },
-      // '/algorithm': {
-      //   target: 'http://localhost:8888',
-      //   changeOrigin: true,
-      //   pathRewrite:{ '^/algorithm': ''}
-      // },
     },
     static: {
       // directory: join(__dirname, '../dist'),
@@ -80,7 +75,7 @@ module.exports = {
       path: './.env.development',
     }),
     new HtmlWebpackPlugin({
-      title: 'map',
+      title: '地图',
       filename: 'index.html',
       template: resolve(__dirname, '../src/web/index.html'),
     }),

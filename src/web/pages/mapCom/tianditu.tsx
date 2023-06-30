@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-28 17:38:38
+ * @LastEditTime: 2023-06-30 17:50:18
  */
 import React, { useState, FC, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import 'ol/ol.css';
@@ -12,23 +12,19 @@ import './tianditu.less';
 import { Map, Overlay, View } from 'ol';
 import { Icon, Style, Text } from 'ol/style.js';
 import { Feature } from 'ol';
-import { Point, MultiPolygon, Polygon, MultiPoint } from 'ol/geom';
+import { Point, MultiPolygon, Polygon, MultiPoint, Geometry } from 'ol/geom';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import GeoJSON from 'ol/format/GeoJSON.js';
-import {getCenter} from 'ol/extent';
 import * as turf from '@turf/turf';
 import XYZ from 'ol/source/XYZ';
 
 import TileLayer from 'ol/layer/Tile.js';
-import { fromLonLat } from 'ol/proj';
-import { DivisionApi } from '@web/api/map';
+import { fromLonLat, transformExtent } from 'ol/proj';
 import { ProjectItem } from '@web/type/map';
-import { Button, Popconfirm, Space, Tooltip } from 'antd';
-import { Fill, Stroke, Circle as sCircle } from 'ol/style';
+import { Tooltip } from 'antd';
+import { Fill, Stroke } from 'ol/style';
 import { CloseOutlined } from '@ant-design/icons';
-import ReactDOMServer from 'react-dom/server';
-import CircleStyle from 'ol/style/Circle';
+import { createTer_w, createImg_w, createCva_w, createVec_w } from './map';
 
 interface Props {
   info: ProjectItem;
@@ -38,23 +34,28 @@ interface Props {
 }
 
 export interface TiandituRef {
-  reset: () => void
+  reset: () => void;
+  setUnderlayType: (val: string) => void;
+  initZoom: () => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  clearLayer: () => void;
 }
 // ../../assets/image/designIocn.png
 const urlObj: Record<string, any> = {
   设计类: require('@assets/image/designIocn.png'),
-  // 设计类选中: require('@assets/image/designIocnChecked.png'),
+  设计类选中: require('@assets/image/designIocnChecked.png'),
 
   EPC: require('@assets/image/epcIcon.png'),
-  // EPC选中: require('@assets/image/epcIconChecked.png'),
+  EPC选中: require('@assets/image/epcIconChecked.png'),
   其他: require('@assets/image/otherIcon.png'),
-  // 其他选中: require('@assets/image/otherIconChecked.png')
+  其他选中: require('@assets/image/otherIconChecked.png'),
 };
 
-const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
+const TiandituMap = forwardRef<TiandituRef, Props>((props, ref) => {
   const { proList, gjson } = props;
   const [proInfo, setProInfo] = useState<ProjectItem | Record<string, any>>({});
-  let centerPos = [108.95, 34.27];
+  let centerPos = fromLonLat([108.95, 34.27]);
   const mapCurrent = useRef(null);
   const popupCurrent = useRef(null);
   let mapCurrents = useRef<any>(null);
@@ -62,17 +63,19 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
   const overlay = useRef<any>(null);
   const featureObject = useRef<any>({});
   const [flag, setFlag] = useState(false);
-  const cityRoundLayer = useRef<any>(null)
-  const layerList = useRef<any[]>([])
+  const cityRoundLayer = useRef<any>(null);
+  const layerList = useRef<any[]>([]);
+  let tileLayer = useRef<TileLayer<XYZ>>();
+  let tileLayerMark = useRef<TileLayer<XYZ>>();
+  let checkedLayer = useRef<Feature<Geometry>>();
 
   /**
    * @description: 渲染项目位置
    * @param {ProjectItem} info
    * @return {*}
    * @author: liushuhao
-   */  
+   */
   const proPositioning = (info: ProjectItem) => {
-    console.log(info, 'proPositioning');
     if (Object.keys(info).length) {
       const featureCurrent = featureObject.current[info.id];
       setProInfo(info);
@@ -85,7 +88,7 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
    * @param {ProjectItem} arr
    * @return {*}
    * @author: liushuhao
-   */  
+   */
   const setIcon = (arr: ProjectItem[]) => {
     featureObject.current = {};
     if (layerList.current.length) {
@@ -123,10 +126,10 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
           }),
         });
         const feature = new Feature({
-          geometry: new Point([Number(item.longitude), Number(item.latitude)]),
+          geometry: new Point(fromLonLat([Number(item.longitude), Number(item.latitude)])),
         });
         const featureText = new Feature({
-          geometry: new Point([Number(item.longitude), Number(item.latitude)]),
+          geometry: new Point(fromLonLat([Number(item.longitude), Number(item.latitude)])),
         });
         feature.setProperties({
           id: item.id,
@@ -141,11 +144,13 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
           source: new VectorSource({
             features: [feature],
           }),
+          zIndex: 99,
         });
         const _markerText = new VectorLayer({
           source: new VectorSource({
             features: [featureText],
           }),
+          zIndex: 99,
         });
         mapCurrents.current.addLayer(_markerText);
         mapCurrents.current.addLayer(_marker);
@@ -158,37 +163,42 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
    * @description: 初始化地图
    * @return {*}
    * @author: liushuhao
-   */  
+   */
   const initMap = () => {
     mapCurrents.current = new Map({
       view: new View({
         center: centerPos, //地图中心位置
-        zoom: 5.4, //地图初始层级
-        projection: 'EPSG:4326'
+        zoom: 5, //地图初始层级
+        projection: 'EPSG:3857',
       }),
       controls: [], // 清空默认控件
       layers: [],
       target: mapCurrent.current!,
     });
-    let tileLayer = new TileLayer({
-      source: new XYZ({
-        url: 'http://t4.tianditu.com/DataServer?T=vec_w&tk=56e3056c11d2a791484e789d494fcac1&x={x}&y={y}&l={z}',
-      }),
-    });
-    tileLayer.set('_id', 'tileLayer');
-    let tileLayerMark = new TileLayer({
-      source: new XYZ({
-        url: 'http://t3.tianditu.com/DataServer?T=cva_w&tk=56e3056c11d2a791484e789d494fcac1&x={x}&y={y}&l={z}',
-      }),
-    });
-    tileLayerMark.set('_id', 'tileLayerMark');
-    mapCurrents.current.addLayer(tileLayer);
-    mapCurrents.current.addLayer(tileLayerMark);
+    tileLayer.current = createVec_w();
+    tileLayer.current.set('_id', 'tileLayer');
+    tileLayerMark.current = createCva_w();
+    tileLayerMark.current.set('_id', 'tileLayerMark');
+    mapCurrents.current.addLayer(tileLayer.current);
+    mapCurrents.current.addLayer(tileLayerMark.current);
     mapCurrents.current.on('click', function (event: { coordinate: any; pixel: any }) {
       mapCurrents.current.forEachFeatureAtPixel(event.pixel, function (feature: any) {
         if (feature.values_?.type === 'feature') {
-          setProInfo(feature.values_.item);
+          const item = feature.get('item');
+          console.log('输出', feature.get('item'), 'feature');
+          const style = new Style({
+            image: new Icon({
+              width: 37,
+              height: 34,
+              src: item.projApprovalType
+                ? urlObj[item.projApprovalType + '选中']
+                : require('../../assets/image/designIocn.png'),
+            }),
+          });
+          feature.setStyle(style);
+          setProInfo(item);
           createOverlay(feature);
+          checkedLayer.current = feature;
         }
       });
     });
@@ -199,7 +209,7 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
    * @param {any} feature
    * @return {*}
    * @author: liushuhao
-   */  
+   */
   const createOverlay = (feature: any) => {
     const { flatCoordinates } = feature.getGeometry();
     mapCurrents.current!.removeOverlay(overlay.current);
@@ -220,17 +230,38 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
    * @description: 关闭弹窗
    * @return {*}
    * @author: liushuhao
-   */  
+   */
   const closeOverlay = () => {
     mapCurrents.current!.removeOverlay(overlay.current);
     setFlag(false);
   };
 
   /**
-   * @description: gjson style 方法
+   * @description: 重置选中的icon
    * @return {*}
    * @author: liushuhao
    */  
+  const resetCheckedPopInfo = () => {
+    if (checkedLayer.current) {
+      const item = checkedLayer.current!.get('item');
+      const style = new Style({
+        image: new Icon({
+          width: 37,
+          height: 34,
+          src: item.projApprovalType
+            ? urlObj[item.projApprovalType]
+            : require('../../assets/image/designIocn.png'),
+        }),
+      });
+      checkedLayer.current.setStyle(style);
+    }
+  }
+
+  /**
+   * @description: gjson style 方法
+   * @return {*}
+   * @author: liushuhao
+   */
   const getStyle = () => {
     return new Style({
       stroke: new Stroke({
@@ -245,20 +276,22 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
    * @param {any} val
    * @return {*}
    * @author: liushuhao
-   */  
+   */
   const reanderGjson = (val: any) => {
     if (val) {
       cityRoundLayer.current && mapCurrents.current.removeLayer(cityRoundLayer.current);
       const geojson = JSON.parse(val.geojson);
-      let lineData =  geojson.coordinates;;
+      let lineData = geojson.coordinates;
       let lineFeature = null;
       if (geojson?.type === 'MultiPolygon') {
+        const geometry = new MultiPolygon(lineData).transform('EPSG:4326', 'EPSG:3857');
         lineFeature = new Feature({
-          geometry: new MultiPolygon(lineData)
+          geometry,
         });
       } else if (geojson?.type === 'Polygon') {
+        const geometry = new Polygon(lineData).transform('EPSG:4326', 'EPSG:3857');
         lineFeature = new Feature({
-          geometry: new Polygon(lineData)
+          geometry,
         });
       }
       const lineSource = new VectorSource({
@@ -270,15 +303,17 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
         source: lineSource,
         style: () => {
           return getStyle();
-        }
+        },
+        zIndex: 99,
       });
-      cityRoundLayer.current = lineLayer
+      cityRoundLayer.current = lineLayer;
       mapCurrents.current.addLayer(lineLayer);
       const geom = turf.getGeom(geojson);
       const bbox = turf.bbox(geom);
-      mapCurrents.current.getView().fit(bbox, {
+      const bboxNew = transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+      mapCurrents.current.getView().fit(bboxNew, {
         duration: 1000,
-        padding: [100, 100, 100, 100]
+        padding: [100, 100, 100, 100],
       });
     }
   };
@@ -288,21 +323,72 @@ const TiandituMap =forwardRef<TiandituRef, Props >((props, ref) => {
    * @param {*} ref
    * @return {*}
    * @author: liushuhao
-   */  
-  useImperativeHandle(ref, ()=> ({
-    reset
-  }))
+   */
+  useImperativeHandle(ref, () => ({
+    reset,
+    setUnderlayType,
+    clearLayer,
+    initZoom,
+    zoomIn,
+    zoomOut,
+  }));
+
+  const clearLayer = () => {
+    resetCheckedPopInfo()
+    closeOverlay();
+    cityRoundLayer.current && mapCurrents.current.removeLayer(cityRoundLayer.current);
+  };
+
+  const initZoom = () => {
+    mapCurrents.current.getView().animate({ zoom: 5, center: centerPos, duration: 1000 });
+  };
+
+  const zoomIn = () => {
+    const zoom = mapCurrents.current.getView().getZoom();
+    mapCurrents.current.getView().animate({ zoom: zoom + 1, duration: 500 });
+  };
+
+  const zoomOut = () => {
+    const zoom = mapCurrents.current.getView().getZoom();
+    mapCurrents.current.getView().animate({ zoom: zoom - 1, duration: 500 });
+  };
+
+
 
   /**
    * @description:重置
    * @return {*}
    * @author: liushuhao
-   */  
+   */
   const reset = () => {
-    closeOverlay()
+    resetCheckedPopInfo()
+    closeOverlay();
     cityRoundLayer.current && mapCurrents.current.removeLayer(cityRoundLayer.current);
-    mapCurrents.current.getView().animate({ zoom: 5.4, center: centerPos, duration: 1000 });
-  }
+    mapCurrents.current.getView().animate({ zoom: 5, center: centerPos, duration: 1000 });
+  };
+
+  /**
+   * @description: 切换项目底图
+   * @return {*}
+   * @author: liushuhao
+   */
+  const setUnderlayType = (val: string) => {
+    mapCurrents.current.removeLayer(tileLayer.current);
+    mapCurrents.current.removeLayer(tileLayerMark.current);
+    const options: Record<string, TileLayer<XYZ>> = {
+      地图: createVec_w(),
+      影像: createImg_w(),
+      地形: createTer_w(),
+    };
+    if (options.hasOwnProperty(val)) {
+      tileLayer.current = options[val];
+      tileLayer.current.set('_id', 'tileLayer');
+      tileLayerMark.current = createCva_w();
+      tileLayerMark.current.set('_id', 'tileLayerMark');
+    }
+    mapCurrents.current.addLayer(tileLayer.current);
+    mapCurrents.current.addLayer(tileLayerMark.current);
+  };
 
   useEffect(() => {
     initMap();

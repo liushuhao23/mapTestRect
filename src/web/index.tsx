@@ -4,8 +4,9 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-28 17:11:02
+ * @LastEditTime: 2023-06-30 16:52:44
  */
+import './wdyr'
 import './public-path'
 import App from '@pages/App';
 import { createRoot } from 'react-dom/client';
@@ -42,7 +43,7 @@ if (!window.__POWERED_BY_QIANKUN__) {
 }
 
 export async function bootstrap() {
-  console.log('[react18] react app bootstraped');
+  console.log('[map] react app bootstraped');
 }
 
 export async function mount(props: any) {

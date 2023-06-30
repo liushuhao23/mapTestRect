@@ -5,6 +5,7 @@ import { CityItem, ProjectItem } from '@web/type/map';
 import { Popover, Space } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import './index.less';
+import useGetState from '@hooks/useGetState';
 
 interface Props {
   getProdInfo: (id: number, info: ProjectItem) => void;
@@ -16,6 +17,12 @@ interface ContentDomProps {
   closePosition: () => void;
   resetFun: (val: void) => void;
   renderingGjson: (val: any) => void;
+  setPositionValueFun: (val: string | null) => void
+}
+
+interface Options {
+  label: string
+  value: string
 }
 const mapping: Record<string, string> = {
   economize: 'market',
@@ -24,19 +31,21 @@ const mapping: Record<string, string> = {
 };
 
 const ContentDom: FC<ContentDomProps> = props => {
-  const { closePosition, renderingGjson, resetFun } = props;
-  const [economizeList, setEconomizeList] = useState<CityItem[]>([]);
-  const [economizeValue, setEconomizeValue] = useState(null);
+  const { closePosition, renderingGjson, resetFun, setPositionValueFun } = props;
+  const [economizeList, setEconomizeList] = useGetState<CityItem[]>([]);
+  const [economizeValue, setEconomizeValue, getEconomizeValue] = useGetState(null);
 
-  const [marketList, setMarketList] = useState<CityItem[]>([]);
-  const [marketValue, setMarketValue] = useState(null);
+  const [marketList, setMarketList] = useGetState<CityItem[]>([]);
+  const [marketValue, setMarketValue, getMarketValue] = useGetState(null);
 
-  const [distinguishList, setDistinguishList] = useState<CityItem[]>([]);
-  const [distinguishValue, setDistinguishValue] = useState(null);
+  const [distinguishList, setDistinguishList] = useGetState<CityItem[]>([]);
+  const [distinguishValue, setDistinguishValue, getDistinguishValue] = useGetState(null);
 
-  const [villageList, setVillageList] = useState<CityItem[]>([]);
-  const [villageValue, setVillageValue] = useState(null);
-  const [disabledButton, setDisabledButton] = useState(true);
+  const [villageList, setVillageList] = useGetState<CityItem[]>([]);
+  const [villageValue, setVillageValue, getVillageValue] = useGetState(null);
+  const [disabledButton, setDisabledButton] = useGetState(true);
+
+  const divisionObj = useRef<Record<string, CityItem | null>>({})
 
   const typeValue = useRef<{ type: string; code: string }>({
     type: '',
@@ -46,25 +55,45 @@ const ContentDom: FC<ContentDomProps> = props => {
     label: 'name',
     value: 'code',
   };
-  const changeEco = (value: any, type: string) => {
+  // type === 'market' && setMarketList(rs.data.children);
+  // type === 'distinguish' && setDistinguishList(rs.data.children);
+  // type === 'village' && setVillageList(rs.data.children);
+  const changeEco = (value: any, options: CityItem | CityItem[], type: string) => {
+    divisionObj.current[type] = options as CityItem
     if (type === 'economize') {
       setEconomizeValue(value);
       setMarketValue(null);
       setDistinguishValue(null);
       setVillageValue(null);
+      divisionObj.current['market'] = null
+      divisionObj.current['distinguish'] = null
+      divisionObj.current['village'] = null
     }
     if (type === 'market') {
       setMarketValue(value);
       setDistinguishValue(null);
       setVillageValue(null);
+      divisionObj.current['distinguish'] =null
+      divisionObj.current['village'] = null
     }
     if (type === 'distinguish') {
       setDistinguishValue(value);
       setVillageValue(null);
+      divisionObj.current['village'] = null
     }
     if (type === 'village') {
       setVillageValue(value);
     }
+
+    let positionValue = '';
+    Object.keys(divisionObj.current).forEach((keyValue: string) => {
+      if (Object.keys(divisionObj.current).length) {
+        if (divisionObj.current[keyValue]) {
+          positionValue += `${divisionObj.current[keyValue]!.name} `;
+        }
+      }
+    });
+    positionValue && setPositionValueFun(positionValue)
     getDivisionFun(value, mapping[type]);
   };
 
@@ -95,10 +124,12 @@ const ContentDom: FC<ContentDomProps> = props => {
   };
 
   const reset = () => {
-    setEconomizeList([]);
-    setMarketList([]);
-    setDistinguishList([]);
-    setVillageList([]);
+    divisionObj.current = {}
+    setPositionValueFun(null)
+    getEconomizeValue() && setEconomizeList([]);
+    getMarketValue() && setMarketList([]);
+    getDistinguishValue() && setDistinguishList([]);
+    getVillageValue() && setVillageList([]);
     setEconomizeValue(null);
     setMarketValue(null);
     setDistinguishValue(null);
@@ -135,7 +166,7 @@ const ContentDom: FC<ContentDomProps> = props => {
                 省级
               </span>
               <Select
-                onChange={value => changeEco(value, 'economize')}
+                onChange={(value, option) => changeEco(value, option, 'economize')}
                 placeholder="选择省"
                 value={economizeValue}
                 fieldNames={fieldEcoNames}
@@ -148,7 +179,7 @@ const ContentDom: FC<ContentDomProps> = props => {
                 市级
               </span>
               <Select
-                onChange={value => changeEco(value, 'market')}
+                onChange={(value, option) => changeEco(value, option, 'market')}
                 fieldNames={fieldEcoNames}
                 placeholder="选择市"
                 value={marketValue}
@@ -161,7 +192,7 @@ const ContentDom: FC<ContentDomProps> = props => {
                 区级
               </span>
               <Select
-                onChange={value => changeEco(value, 'distinguish')}
+                onChange={(value, option) => changeEco(value, option, 'distinguish')}
                 fieldNames={fieldEcoNames}
                 placeholder="选择区"
                 value={distinguishValue}
@@ -174,7 +205,7 @@ const ContentDom: FC<ContentDomProps> = props => {
                 乡级
               </span>
               <Select
-                onChange={value => changeEco(value, 'village')}
+                onChange={(value, option) => changeEco(value, option, 'village')}
                 fieldNames={fieldEcoNames}
                 placeholder="选择乡"
                 value={villageValue}
@@ -201,6 +232,7 @@ const ContentDom: FC<ContentDomProps> = props => {
     </>
   );
 };
+ContentDom.whyDidYouRender = true
 
 const SearchCom: FC<Props> = props => {
   const { getProdInfo, getProList, renderingGjson, resetFun } = props;
@@ -211,6 +243,8 @@ const SearchCom: FC<Props> = props => {
   const [defaultTypeValue, setDefaultTypeValue] = useState('-1');
   const [defaultProValue, setDefaultProValue] = useState();
   const [visible, setVisible] = useState(false);
+
+  const [positionValue, setPositionValue] = useState<string | null>('')
 
   const fieldTypeNames = {
     label: 'typeName',
@@ -274,6 +308,9 @@ const SearchCom: FC<Props> = props => {
     getProjectInfoFun(params);
   };
 
+  const setPositionValueFun = (val: string | null) => {
+    setPositionValue(val)
+  }
   const closePosition = () => {
     setVisible(false);
   };
@@ -290,7 +327,7 @@ const SearchCom: FC<Props> = props => {
   useEffect(() => {
     const fun = async () => {
       await getTypeList();
-      await getEntList();
+      // await getEntList();
       await getProjectInfoFun();
     };
     fun();
@@ -329,6 +366,7 @@ const SearchCom: FC<Props> = props => {
             closePosition={closePosition}
             resetFun={resetFun}
             renderingGjson={renderingGjson}
+            setPositionValueFun={setPositionValueFun}
           />
         }
         title=""
@@ -343,12 +381,13 @@ const SearchCom: FC<Props> = props => {
             <svg className="w-[15px] h-[15px] mr-[5px]" aria-hidden="true">
               <use xlinkHref="#icon-dingwei"></use>
             </svg>
-            <span className="text-[rgba(157,170,194)]">全国</span>
+            <span className="text-[rgba(157,170,194)]">{positionValue? positionValue : '全国'}</span>
           </span>
         </div>
       </Popover>
     </div>
   );
 };
+SearchCom.whyDidYouRender = true
 
 export default SearchCom;

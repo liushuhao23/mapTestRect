@@ -21,6 +21,7 @@
     "@antv/hierarchy": "^0.6.8",
     "@antv/x6": "^1.34.5",
     "@turf/turf": "^6.5.0",
+    "@welldone-software/why-did-you-render": "^7.0.1",
     "antd": "^4.24.0",
     "axios": "^0.26.1",
     "codemirror": "^5.65.8",

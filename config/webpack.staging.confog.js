@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:16
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-08 15:43:27
+ * @LastEditTime: 2023-06-30 16:56:36
  */
 const TerserPlugin = require('terser-webpack-plugin');
 const os = require('os');
@@ -33,7 +33,7 @@ module.exports = {
       path: './.env.staging',
     }),
     new HtmlWebpackPlugin({
-      title: 'map',
+      title: '地图',
       filename: 'index.html',
       template: resolve(__dirname, '../src/web/index.html'),
     }),
