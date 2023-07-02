@@ -18,9 +18,9 @@ const webpackBaseConfig = {
     library: `${packageName}-[name]`,
     libraryTarget: 'umd',
     globalObject: 'window',
-    path: resolve(__dirname, '../dist'),
+    path: resolve(__dirname, 'dist'),
     // publicPath: process.env.APP_PUBLIC_PATH,
-    filename: 'scripts/[name].[contenthash:5].bundule.js'
+    filename: 'js/[name].[contenthash:5].bundule.js'
   },
   cache: {
     type: 'filesystem',
@@ -74,8 +74,11 @@ const webpackBaseConfig = {
         ],
       },
       {
-        test: /\.(png|jpg|svg)$/,
+        test: /\.(png|jpg|svg|jpeg)$/,
         type: 'asset',
+        generator: {
+          filename: 'img/[name]_[hash:8][ext]'
+        }
       }
     ],
   },

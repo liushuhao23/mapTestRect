@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-06-01 22:19:16
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-30 16:57:01
+ * @LastEditTime: 2023-07-02 15:19:43
  */
 const TerserPlugin = require('terser-webpack-plugin');
 const os = require('os');
