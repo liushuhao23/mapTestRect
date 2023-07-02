@@ -1,21 +1,28 @@
-
 /*
  * @Description: description
  * @Version: 2.0
  * @Autor: liushuhao
- * @Date: 2023-06-08 22:05:59
+ * @Date: 2022-11-25 16:17:45
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 00:07:46
+ * @LastEditTime: 2023-07-02 13:43:48
  */
-import { AxiosRequestConfig } from 'axios';
-let workspaceData: any
-export const getWorkspaceData = (val: any) => {
-  workspaceData = val
-} 
+import { UtilsTools } from '@assets/utils/utilsTools';
+import useStore from '@web/store/index';
 
-export const settingHttpHeaders = (requestConfig: any,): AxiosRequestConfig => {
-  if( workspaceData?.token) {
-    requestConfig.headers['Uc-Authorization'] = workspaceData.token;
+const { getState } = useStore;
+export const settingHttpHeaders = (requestConfig: any): any => {
+  const { globalStore, isBx, useInfo, mainData } = getState();
+  if (isBx) {
+    requestConfig.headers.entid = UtilsTools.getEntId(globalStore.value);
+    requestConfig.headers.accountId = UtilsTools.getAccontId(globalStore.value);
+  } else {
+    if (mainData?.token) {
+      requestConfig.headers['Uc-Authorization'] = mainData.token;
+    }
+    if (mainData?.isLocalhost) {
+      requestConfig.headers.ip = 'localhost';
+    }
   }
+
   return requestConfig;
-}
+};

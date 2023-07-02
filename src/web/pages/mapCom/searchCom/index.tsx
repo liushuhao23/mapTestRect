@@ -1,6 +1,6 @@
 import { Button, Select, message } from 'antd';
 import { DivisionApi } from '@web/api/map';
-import React, { useState, FC, useEffect, useRef } from 'react';
+import React, { useState, FC, useEffect, useRef, memo } from 'react';
 import { CityItem, ProjectItem } from '@web/type/map';
 import { Popover, Space } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
@@ -232,7 +232,7 @@ const ContentDom: FC<ContentDomProps> = props => {
     </>
   );
 };
-ContentDom.whyDidYouRender = true
+// ContentDom.whyDidYouRender = true
 
 const SearchCom: FC<Props> = props => {
   const { getProdInfo, getProList, renderingGjson, resetFun } = props;
@@ -388,6 +388,6 @@ const SearchCom: FC<Props> = props => {
     </div>
   );
 };
-SearchCom.whyDidYouRender = true
+// SearchCom.whyDidYouRender = true
 
-export default SearchCom;
+export default memo(SearchCom);

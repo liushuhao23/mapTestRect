@@ -15,5 +15,8 @@ export interface UtilsClass {
     removeStringSpace: (str: string) => string
     debounce: (fn: any, wait: number, immediate?: boolean) => (...args: any) => {}
     dealBlob: (res: any) => Promise<any>
+    getAccontId: (state: any) => string | undefined
+    getEntId: (state: any) => string | undefined
+    isBx: () => boolean
 }
 

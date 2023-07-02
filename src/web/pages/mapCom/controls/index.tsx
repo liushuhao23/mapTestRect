@@ -4,9 +4,9 @@
  * @Autor: liushuhao
  * @Date: 2023-06-28 17:39:35
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-30 14:27:51
+ * @LastEditTime: 2023-07-02 12:43:44
  */
-import React, { useState, FC } from 'react';
+import React, { useState, FC, memo  } from 'react';
 interface Props {
   setUnderlayType: (val: string) => void
   initZoomFun: () => void
@@ -107,7 +107,7 @@ const ControlsCom: FC<Props> = (props) => {
         {underlayFlag && (
           <div className="absolute left-[-160px] flex text-[#fff]">
             {underlayList.map(item => (
-              <div key={item.name} onClick={() =>  clickunderlayItem(item)} className="w-[45px] h-[45px] rounded-[50%] bg-[#ffffff] ml-[5px] overflow-hidden relative">
+              <div key={item.name} onClick={() => clickunderlayItem(item)} className="w-[45px] h-[45px] rounded-[50%] bg-[#ffffff] ml-[5px] overflow-hidden relative">
                 <img src={item.img} className="w-full h-full rounded-[50%]" alt="" />
                 <div className={`${item.checked ? 'border-[1px] border-solid border-[#0ffaff] text-[#0ffaff]' : ''} w-[45px] h-[23px] text-[10px] pt-[5px] absolute bottom-0 left-0 right-0 m-auto text-center whitespace-nowrap bg-[rgba(25,40,58,0.3)]`}>
                   <span>{item.name}</span>
@@ -120,5 +120,5 @@ const ControlsCom: FC<Props> = (props) => {
     </div>
   );
 };
-ControlsCom.whyDidYouRender = true;
-export default ControlsCom;
+// ControlsCom.whyDidYouRender = true;
+export default memo(ControlsCom);

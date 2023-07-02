@@ -4,7 +4,7 @@
  * @Autor: liushuhao
  * @Date: 2022-07-01 09:14:34
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-30 16:52:44
+ * @LastEditTime: 2023-07-02 13:40:21
  */
 import './wdyr'
 import './public-path'
@@ -15,19 +15,19 @@ import './style.css';
 import 'antd/dist/antd.less';
 import zhCN from 'antd/es/locale/zh_CN';
 import { emitter } from './mitt';
-import { CommunicationProtocol } from './common';
-import { getWorkspaceData } from './assets/http/useHttp';
+import { initCommunicationProtocol } from './common';
 import { ConfigProvider } from 'antd';
 import '@assets/reset.css'
 import '@assets/css/index.less'
 import '@assets/svg/iconfont';
 import '@assets/svg/iconfont.css';
+import useStore  from '@web/store/index'
 
 
 let root: any;
 function render(props: any) {
   const { container } = props;
-  emitter.on('getWorkspaceData', getWorkspaceData)
+  const { getState } = useStore
   root = createRoot(container? container.querySelector('#app')! : document.querySelector('#app'));
   root.render(
     <BrowserRouter basename={window.__POWERED_BY_QIANKUN__ ? '/city' : '/'} >
@@ -48,7 +48,7 @@ export async function bootstrap() {
 
 export async function mount(props: any) {
   render(props);
-  new CommunicationProtocol(props)
+  initCommunicationProtocol(props)
   console.log('[map] props from main framework', props);
 }
 

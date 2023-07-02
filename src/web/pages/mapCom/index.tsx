@@ -4,13 +4,15 @@
  * @Autor: liushuhao
  * @Date: 2023-06-08 13:50:56
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-30 17:15:03
+ * @LastEditTime: 2023-07-02 13:46:06
  */
-import { useState, FC, useRef } from 'react';
+import { useState, FC, useRef, memo, useCallback, useEffect } from 'react';
 import TiandituMap, { TiandituRef } from './tianditu';
 import { ProjectItem } from '@web/type/map';
 import SearchCom from './searchCom';
 import ControlsCom from './controls';
+
+
 const legendList = [
   {
     name: '设计类',
@@ -30,7 +32,6 @@ const MapCom: FC = () => {
   const [proList, setProList] = useState<ProjectItem[]>([]);
   const [gjson, setGjson] = useState<string>('');
   const tiandituCom = useRef<TiandituRef>(null);
-
   const renderingGjson = (gjson: any) => {
     setGjson(gjson);
   };
@@ -43,34 +44,35 @@ const MapCom: FC = () => {
     setProList(val);
   };
 
-  const resetFun = () => {
+  const resetFun = useCallback(() => {
     tiandituCom.current!.reset();
-  };
+  }, []);
 
-  const initZoomFun = () => {
+  const initZoomFun = useCallback(() => {
     tiandituCom.current!.initZoom();
-  };
+  }, []);
 
-  const zoomInFun = () => {
+  const zoomInFun = useCallback(() => {
     tiandituCom.current!.zoomIn();
-  };
+  }, []);
 
-  const zoomOutFun = () => {
+  const zoomOutFun = useCallback(() => {
     tiandituCom.current!.zoomOut();
-  };
+  }, []);
 
-  const clearLayerFun = () => {
+  const clearLayerFun = useCallback(() => {
     tiandituCom.current!.clearLayer();
-  };
+  }, []);
 
   /**
    * @description: 设置天地图底图
    * @return {*}
    * @author: liushuhao
    */
-  const setUnderlayType = (val: string) => {
+  const setUnderlayType = useCallback((val: string) => {
     tiandituCom.current!.setUnderlayType(val);
-  };
+  }, []);
+
   return (
     <div className="h-full w-full">
       <SearchCom
@@ -108,5 +110,5 @@ const MapCom: FC = () => {
     </div>
   );
 };
-MapCom.whyDidYouRender = true;
-export default MapCom;
+// MapCom.whyDidYouRender = true;
+export default memo(MapCom);

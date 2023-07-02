@@ -4,26 +4,26 @@
  * @Autor: liushuhao
  * @Date: 2023-02-13 15:10:28
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-13 00:11:41
+ * @LastEditTime: 2023-07-02 13:49:42
  */
-
-import { emitter } from "@web/mitt";
-
-
-// eslint-disable-next-line import/no-mutable-exports
-// let communicationProtocol = null;
-
-// eslint-disable-next-line import/no-mutable-exports
-let mainData: any;
+import useStore  from '@web/store/index'
+let communicationProtocol: any = null;
+const { getState, setState } = useStore
 
 class CommunicationProtocol {
     options: any
 
+    globalStoreData: any = null
+
     globalStore: any
 
-    globalStoreData: any
+    isBx = false
 
-    constructor(options: any) {
+    userInfo: any = {}
+
+    mainData: any = {}
+
+    constructor(options?: any) {
       this.options = options;
       if (this.options) {
         this.Init();
@@ -31,15 +31,43 @@ class CommunicationProtocol {
     }
 
     Init() {
-      const { globalStore } = this.options;
+      const { globalStore, user } = this.options;
       if (globalStore) {
         this.globalStore = globalStore;
         // 监听全局数据存储对象更新
         globalStore.onGlobalStoreChange((params: any) => {
-          emitter.emit('getWorkspaceData', params)
-          mainData = params;
+         if (Object.prototype.toString.call(params) === '[object Array]') {
+          this.isBx = true;
+          const [newData, oldData] = params;
+          this.globalStoreData.value = newData;
+          setState({globalStore: newData})
+         } else {
+          this.isBx = false;
+          console.log('来自玖洲工作台');
+          this.globalStoreData.value = params;
+          this.mainData = params;
+          setState({mainData: this.mainData})
+         }
+         setState({isBx: this.isBx})
         }, true);
       }
+      if (user) {
+        if (this.isBx) {
+          this.userInfo.value = user;
+          setState({useInfo: this.userInfo})
+
+        }
+      }
+    }
+
+    getData() {
+      return { data: this.globalStoreData.value, isBx: this.isBx, userInfo: this.userInfo };
     }
 }
-export { CommunicationProtocol, mainData };
+
+const initCommunicationProtocol = (options: any) => {
+  if (!communicationProtocol) {
+    communicationProtocol = new CommunicationProtocol(options)
+  }
+}
+export { initCommunicationProtocol, communicationProtocol };

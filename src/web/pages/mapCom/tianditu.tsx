@@ -4,9 +4,9 @@
  * @Autor: liushuhao
  * @Date: 2023-06-11 20:36:04
  * @LastEditors: liushuhao
- * @LastEditTime: 2023-06-30 17:50:18
+ * @LastEditTime: 2023-07-02 14:58:20
  */
-import React, { useState, FC, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, FC, useEffect, useRef, useImperativeHandle, forwardRef, memo } from 'react';
 import 'ol/ol.css';
 import './tianditu.less';
 import { Map, Overlay, View } from 'ol';
@@ -21,16 +21,23 @@ import XYZ from 'ol/source/XYZ';
 import TileLayer from 'ol/layer/Tile.js';
 import { fromLonLat, transformExtent } from 'ol/proj';
 import { ProjectItem } from '@web/type/map';
-import { Tooltip } from 'antd';
+import { Button, message, Tooltip } from 'antd';
 import { Fill, Stroke } from 'ol/style';
 import { CloseOutlined } from '@ant-design/icons';
 import { createTer_w, createImg_w, createCva_w, createVec_w } from './map';
-
+import useStore  from '@web/store/index'
+import create from 'zustand'
+import { UtilsTools } from '@assets/utils/utilsTools';
+import useGetState from '@hooks/useGetState';
+import { DivisionApi } from '@web/api/map';
+import { WorkspaceApi } from '@web/api/workspace/pro';
 interface Props {
   info: ProjectItem;
   proList: ProjectItem[];
   gjson: string;
   closeOverlay?: () => void;
+  globalStore?: any
+  userInfo?: any
 }
 
 export interface TiandituRef {
@@ -41,7 +48,6 @@ export interface TiandituRef {
   zoomOut: () => void;
   clearLayer: () => void;
 }
-// ../../assets/image/designIocn.png
 const urlObj: Record<string, any> = {
   设计类: require('@assets/image/designIocn.png'),
   设计类选中: require('@assets/image/designIocnChecked.png'),
@@ -52,9 +58,15 @@ const urlObj: Record<string, any> = {
   其他选中: require('@assets/image/otherIconChecked.png'),
 };
 
+const isBx= UtilsTools.isBx()
+
 const TiandituMap = forwardRef<TiandituRef, Props>((props, ref) => {
+  const store = create(useStore)
+  const globalStore = store((state: any) => state.globalStore)
+  const userInfo = store((state: any) => state.userInfo)
+
   const { proList, gjson } = props;
-  const [proInfo, setProInfo] = useState<ProjectItem | Record<string, any>>({});
+  const [proInfo, setProInfo] = useGetState<ProjectItem | Record<string, any>>({});
   let centerPos = fromLonLat([108.95, 34.27]);
   const mapCurrent = useRef(null);
   const popupCurrent = useRef(null);
@@ -66,16 +78,15 @@ const TiandituMap = forwardRef<TiandituRef, Props>((props, ref) => {
   const cityRoundLayer = useRef<any>(null);
   const layerList = useRef<any[]>([]);
   let tileLayer = useRef<TileLayer<XYZ>>();
-  let tileLayerMark = useRef<TileLayer<XYZ>>();
+  let tileLayerMark = useRef<TileLayer<XYZ>>(); 
   let checkedLayer = useRef<Feature<Geometry>>();
-
   /**
    * @description: 渲染项目位置
    * @param {ProjectItem} info
    * @return {*}
    * @author: liushuhao
    */
-  const proPositioning = (info: ProjectItem) => {
+  const proPositioning = (info: ProjectItem ) => {
     if (Object.keys(info).length) {
       const featureCurrent = featureObject.current[info.id];
       setProInfo(info);
@@ -390,6 +401,34 @@ const TiandituMap = forwardRef<TiandituRef, Props>((props, ref) => {
     mapCurrents.current.addLayer(tileLayerMark.current);
   };
 
+  const getProjectValue = (val: string) => {
+    const info = props.proList.filter((item) => item.projId === val)
+    if (!info.length) {
+      message.error('该项目不在地图上')
+      return
+    }
+    proPositioning(info[0])
+  };
+
+  /**
+ * @description: 获取城市对应的gjson 只有八仙调用，玖洲不走这个方法
+ * @param {*} code
+ * @return {*}
+ * @author: liushuhao
+ */
+const getCityGjson = (code: string): Promise<{gjson: string, x: number, y: number}> => new Promise((r, j) => {
+  DivisionApi.getCityDetail({ code, maxLevel: '5' }).then((rs) => {
+    if (rs?.code === 200) {
+      if (rs?.data?.geojson) {
+        r({ gjson: rs.data.geojson, x: rs.data.xcoordinate, y: rs.data.ycoordinate });
+      } else {
+        message.error('该区域没行政区划示例数据，请联系管理员');
+        j(new Error('该区域没行政区划示例数据，请联系管理员'));
+      }
+    }
+  });
+});
+
   useEffect(() => {
     initMap();
   }, []);
@@ -401,10 +440,30 @@ const TiandituMap = forwardRef<TiandituRef, Props>((props, ref) => {
   }, [props.info]);
 
   useEffect(() => {
+    console.log('输出',  props.proList)
     if (proList.length) {
       setIcon(proList);
     }
   }, [props.proList]);
+
+  useEffect(() => {
+    if (globalStore && isBx) {
+      if (globalStore.workspace.type === 0) {
+        mapCurrents.current.getView().animate({ zoom: 5, center: centerPos, duration: 1000 });
+      }
+      if (globalStore.workspace.type === 2) {
+        console.log('项目变更，项目id', globalStore.workspace.workspaceMetaglobalStore.globalStore.id);
+        const proId = globalStore.workspace.workspaceMetaglobalStore.globalStore.id;
+        getProjectValue(proId);
+      }
+      if (globalStore.workspace.type === 3) {
+        console.log('城市变更，城市id', globalStore.workspace.cityCode);
+        getCityGjson(globalStore.workspace.cityCode).then((rs: any) => {
+          reanderGjson(rs)
+        });
+      }
+    }
+  }, [ globalStore ])
 
   return (
     <div id="map" className="mapMontainer" ref={mapCurrent}>
@@ -418,7 +477,7 @@ const TiandituMap = forwardRef<TiandituRef, Props>((props, ref) => {
             destroyTooltipOnHide={true}
             getPopupContainer={() => popupCurrent.current!}
             open={flag}
-            title={<InfoPop closeOverlay={closeOverlay} info={proInfo as ProjectItem}></InfoPop>}
+            title={<InfoPop closeOverlay={closeOverlay} userInfo={userInfo} globalStore={globalStore} info={proInfo as ProjectItem}></InfoPop>}
           ></Tooltip>
         )}
       </div>
@@ -426,14 +485,51 @@ const TiandituMap = forwardRef<TiandituRef, Props>((props, ref) => {
   );
 });
 
-const InfoPop: FC<Pick<Props, 'info' | 'closeOverlay'>> = props => {
-  const { info, closeOverlay } = props;
+const InfoPop: FC<Pick<Props, 'info' | 'closeOverlay' | 'globalStore' | 'userInfo'>> = props => {
+  const { info, globalStore, closeOverlay, userInfo } = props;
   const closeInfoPop = () => {
     closeOverlay!();
   };
+
+  const updatePro = () => {
+    const params = {
+      projectId: '',
+      type: 0,
+      userId: '',
+      accountId: ''
+    };
+    params.projectId = info.projId!;
+    params.userId = userInfo.id;
+    params.accountId = UtilsTools.getAccontId(globalStore.state.newData)!;
+    WorkspaceApi.judgeProjectPermission(info.projId!).then((rs: any) => {
+      if (rs?.data) {
+        if (globalStore.state.newData.type === 2) {
+          WorkspaceApi.lastLogin(params).then((r) => {
+            console.log('输出', r);
+            window.location.href = '';
+          });
+        } else {
+          window.location.href = '';
+        }
+      } else {
+        message.error('您没有该项目权限');
+      }
+    });
+  };
+  
+
+  const goDataPositioning = () => {
+    const ip = `${process.env.APP_API_PROXY}/changjiang/placement?projectId=${info.projId}`;
+    console.log('数据落位地址', ip);
+    window.open(ip);
+  };
+
+  const goProInfo = () => {
+    updatePro();
+  };
   return (
     <>
-      <div className="relative w-[300px] h-[285px] bg-[#FFFFFF] rounded-[8px] z-[998]">
+      <div  className="relative w-[300px] bg-[#FFFFFF] rounded-[8px] z-[998]" >
         <div className="absolute top-[2px] right-[5px] cursor-pointer">
           <CloseOutlined onClick={closeInfoPop} />
         </div>
@@ -459,8 +555,15 @@ const InfoPop: FC<Pick<Props, 'info' | 'closeOverlay'>> = props => {
             {info.projAddress ? info.projAddress : ''}
           </div>
         </div>
+          {
+            isBx && <div className='w-full py-[5px] flex flex-row-reverse right-0 px-0'>
+            <Button className='mr-[5px]' size='small' onClick={goDataPositioning}>数据落位</Button>
+            <Button className='mr-[5px]' size='small'  onClick={goProInfo}>项目详情</Button>
+          </div>
+          }
+
       </div>
     </>
   );
 };
-export default TiandituMap;
+export default memo(TiandituMap);
